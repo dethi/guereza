@@ -1,11 +1,10 @@
 package com.epita.guereza;
 
-import org.jsoup.nodes.Document;
 
 public interface ICrawler {
-    Document crawl(final String url);
+    RawDocument crawl(final String url);
 
-    String[] extractUrl(Document doc);
+    String[] extractUrl(RawDocument doc);
 
-    String extractText(Document doc);
+    String extractText(RawDocument doc);
 }

@@ -1,6 +1,5 @@
 package com.epita.guereza;
 
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ public class Main {
             if (url == null)
                 break;
 
-            Document doc = crawler.crawl(url);
+            RawDocument doc = crawler.crawl(url);
             if (doc == null)
                 continue;
 

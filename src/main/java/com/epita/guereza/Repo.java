@@ -14,9 +14,9 @@ public class Repo implements IRepo {
     private Set<String> urlTodo;
 
     public Repo () {
-        urlDone = new LinkedHashSet<String>();
-        urlDoing = new LinkedHashSet<String>();
-        urlTodo = new LinkedHashSet<String>();
+        urlDone = new LinkedHashSet<>();
+        urlDoing = new LinkedHashSet<>();
+        urlTodo = new LinkedHashSet<>();
     }
 
     @Override
