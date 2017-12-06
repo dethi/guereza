@@ -3,6 +3,7 @@ package com.epita.guereza;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.Normalizer;
 import java.util.Arrays;
 
 public class Indexer {
@@ -14,11 +15,14 @@ public class Indexer {
         RawDocument d = c.crawl(url);
         String text = c.extractText(d);
 
-
         String[] sentences = getSentences(text);
-        for (String s : sentences) {
-            System.out.println(s);
-            System.out.println("------");
+        for (String s: sentences) {
+            String[] words = getWords(s);
+            for (String word: words) {
+                System.out.printf("%s|", word);
+            }
+            System.out.println();
+            System.out.println("===");
         }
         return null;
     }
@@ -26,6 +30,15 @@ public class Indexer {
     String[] getSentences(String text) {
         return Arrays.stream(text.split("[.!?]"))
                 .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toArray(String[]::new);
+    }
+
+    String[] getWords(String sentence) {
+        return Arrays.stream(sentence.split("\\s+"))
+                .map(String::toLowerCase)
+                .map(s -> Normalizer.normalize(s, Normalizer.Form.NFD))
+                .map(s -> s.replaceAll("[^-\\dA-Za-z ]", ""))
                 .filter(s -> !s.isEmpty())
                 .toArray(String[]::new);
     }
