@@ -14,6 +14,7 @@ public class Crawler implements ICrawler {
     @Override
     public Document crawl(final String url) {
         try {
+            logger.info("crawling {}", url);
             return Jsoup.connect(url).get();
         } catch (IOException e) {
             logger.error(e.getMessage());

@@ -22,6 +22,9 @@ public class Repo implements IRepo {
     @Override
     public void store(String[] urls) {
         for (String url: urls) {
+            if (url == null || url.isEmpty())
+                continue;
+
             if (!urlDone.contains(url) && !urlDoing.contains(url))
                 urlTodo.add(url);
         }
