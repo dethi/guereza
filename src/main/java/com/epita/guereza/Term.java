@@ -3,12 +3,12 @@ package com.epita.guereza;
 public class Term {
     private final String token;
     private final Integer[] position;
-    private final Integer frequence;
+    private final double frequency;
 
-    public Term(final String token, final Integer[] position, final Integer frequence) {
+    public Term(final String token, final Integer[] position, final double frequency) {
         this.token = token;
         this.position = position;
-        this.frequence = frequence;
+        this.frequency = frequency;
     }
 
     public String getToken() {
@@ -19,7 +19,7 @@ public class Term {
         return position;
     }
 
-    public Integer getFrequence() {
-        return frequence;
+    public double getFrequency() {
+        return frequency;
     }
 }
