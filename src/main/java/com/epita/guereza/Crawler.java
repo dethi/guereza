@@ -13,7 +13,7 @@ public class Crawler implements ICrawler {
 
     public Document crawl(final String url) {
         try {
-            return Jsoup.connect("http://google.com/").get();
+            return Jsoup.connect(url).get();
         } catch (IOException e) {
             logger.error(e.getMessage());
             return null;
