@@ -1,10 +1,12 @@
 package com.epita.guereza;
 
+import java.util.List;
+
 public class Document {
     private final String url;
-    private final Term[] terms;
+    private final List<Term> terms;
 
-    public Document(final String url, final Term[] terms) {
+    public Document(final String url, final List<Term> terms) {
         this.url = url;
         this.terms = terms;
     }
@@ -13,7 +15,7 @@ public class Document {
         return url;
     }
 
-    public Term[] getTerms() {
+    public List<Term> getTerms() {
         return terms;
     }
 }

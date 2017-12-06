@@ -6,7 +6,11 @@ import org.slf4j.LoggerFactory;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 
 public class Indexer {
     private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
@@ -17,42 +21,19 @@ public class Indexer {
         RawDocument d = c.crawl(url);
         String text = c.extractText(d);
 
-
         String[] sentences = getSentences(text);
-
-        String[] tokens = Arrays.stream(sentences)
+        Map<String, Long> tokens = Arrays.stream(sentences)
                 .map(this::getWords)
                 .flatMap(Function.identity())
-                .toArray(String[]::new);
+                .collect(groupingBy(Function.identity(), counting()));
 
-        String[][] tokensPerSentences = Arrays.stream(sentences)
-                .map(this::getWords)
-                .map(s -> s.toArray(String[]::new))
-                .toArray(String[][]::new);
+        Long totalTokens = tokens.values().stream().mapToLong(i -> i).sum();
 
-        HashSet<String> terms = new HashSet<>(Arrays.asList(tokens));
-
-        List<Term> res = new ArrayList<>();
-        for (String term : terms) {
-            double val = tfIdf(tokens, tokensPerSentences, term);
-            res.add(new Term(term, null, val));
+        List<Term> terms = new ArrayList<>();
+        for (Map.Entry<String, Long> entry: tokens.entrySet()) {
+            terms.add(new Term(entry.getKey(), null, entry.getValue() / totalTokens));
         }
-
-        res.sort((a, b) -> Double.compare(b.getFrequency(), a.getFrequency()));
-        for (Term t : res) {
-            System.out.printf("%s: %f\n", t.getToken(), t.getFrequency());
-        }
-
-        return null;
-    }
-
-    private double tf(String[] tokens, String term) {
-        double result = 0;
-        for (String word : tokens) {
-            if (term.equalsIgnoreCase(word))
-                result++;
-        }
-        return result / tokens.length;
+        return new Document(url, terms);
     }
 
     private double idf(String[][] sentences, String term) {
@@ -66,10 +47,6 @@ public class Indexer {
             }
         }
         return Math.log(sentences.length / n);
-    }
-
-    private double tfIdf(String[] tokens, String[][] tokensPerSentences, String term) {
-        return tf(tokens, term) * idf(tokensPerSentences, term);
     }
 
     String[] getSentences(String text) {
