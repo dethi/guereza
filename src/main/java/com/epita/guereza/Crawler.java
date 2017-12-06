@@ -11,6 +11,7 @@ import java.io.IOException;
 public class Crawler implements ICrawler {
     private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
 
+    @Override
     public Document crawl(final String url) {
         try {
             return Jsoup.connect(url).get();
@@ -20,11 +21,13 @@ public class Crawler implements ICrawler {
         }
     }
 
+    @Override
     public String[] extractUrl(Document doc) {
         Elements elts = doc.select("a");
         return elts.stream().map((e) -> e.absUrl("href")).toArray(String[]::new);
     }
 
+    @Override
     public String extractText(Document doc) {
         return doc.text();
     }
