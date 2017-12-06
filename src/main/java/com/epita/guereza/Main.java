@@ -10,9 +10,15 @@ public class Main {
         logger.debug("Starting crawler");
 
         Repo repo = new Repo();
+
+
+        repo.store(new String[]{"https://en.wikipedia.org/wiki/Halifax_Explosion"});
+        Indexer indexer = new Indexer();
+        indexer.index(repo.nextUrl());
+
         Crawler crawler = new Crawler();
 
-        repo.store(new String[]{"https://en.wikipedia.org/wiki/Main_Page"});
+        /*
         while (true) {
             String url = repo.nextUrl();
             if (url == null)
@@ -25,5 +31,6 @@ public class Main {
             String[] urls = crawler.extractUrl(doc);
             repo.store(urls);
         }
+        */
     }
 }
