@@ -15,6 +15,8 @@ public class Indexer {
         RawDocument d = c.crawl(url);
         String text = c.extractText(d);
 
+
+
         String[] sentences = getSentences(text);
         for (String s: sentences) {
             String[] words = getWords(s);
@@ -40,6 +42,7 @@ public class Indexer {
                 .map(s -> Normalizer.normalize(s, Normalizer.Form.NFD))
                 .map(s -> s.replaceAll("[^-\\dA-Za-z ]", ""))
                 .filter(s -> !s.isEmpty())
+                .filter(w -> !StopWords.match(w))
                 .toArray(String[]::new);
     }
 
