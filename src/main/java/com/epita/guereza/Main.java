@@ -16,6 +16,57 @@ public class Main {
         Indexer indexer = new Indexer();
         indexer.index(repo.nextUrl());
 
+        /*
+        String[] words = new String[] {
+                        "consign",
+                        "consigned",
+                        "consigning",
+                        "consignment",
+                        "consist",
+                        "consisted",
+                        "consistency",
+                        "consistent",
+                        "consistently",
+                        "consisting",
+                        "consists",
+                        "consolation",
+                        "consolations",
+                        "consolatory",
+                        "console",
+                        "consoled",
+                        "consoles",
+                        "consolidate",
+                        "consolidated",
+                        "consolidating",
+                        "consoling",
+                        "consolingly",
+                        "consols",
+                        "consonant",
+                        "consort",
+                        "consorted",
+                        "consorting",
+                        "conspicuous",
+                        "conspicuously",
+                        "conspiracy",
+                        "conspirator",
+                        "conspirators",
+                        "conspire",
+                        "conspired",
+                        "conspiring",
+                        "constable",
+                        "constables",
+                        "constance",
+                        "constancy",
+                        "constant",
+                        "knottlaa",
+                        "knottly",
+                        "knott"
+        };
+        for (String w: words) {
+            System.out.println(indexer.stemmed(w));
+        }
+        */
+
         Crawler crawler = new Crawler();
 
         /*

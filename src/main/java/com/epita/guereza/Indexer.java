@@ -84,8 +84,16 @@ public class Indexer {
                 .map(String::toLowerCase)
                 .map(s -> Normalizer.normalize(s, Normalizer.Form.NFD))
                 .map(s -> s.replaceAll("[^-\\dA-Za-z ]", ""))
+                .map(this::stemmed)
                 .filter(s -> !s.isEmpty())
                 .filter(w -> !StopWords.match(w));
+    }
+
+    String stemmed(String word) {
+        return word.replaceAll("(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$", "")
+                .replaceAll("y$", "i")
+                .replaceAll("(b|d|f|g|m|n|p|r|t){2}$", "$1")
+                .replaceAll("ies$", "i");
     }
 
     public void publish(Document d) {
