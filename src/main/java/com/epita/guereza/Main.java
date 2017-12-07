@@ -7,10 +7,7 @@ import com.epita.guereza.indexer.IndexerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -19,9 +16,9 @@ public class Main {
         logger.debug("Starting crawler");
 
         final Index index = new Index();
-        final Repo repo = new Repo();
+        final Repo repo = new RepoStore();
 
-        repo.store(new String[]{ "https://www.bbc.co.uk/food/recipes/saladenicoise_6572" });
+        repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
         testCrawl(repo);
         testIndexing(repo, index);
         testSearch(index, "onions courgettes pepper");
