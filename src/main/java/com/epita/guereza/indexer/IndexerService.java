@@ -6,11 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
@@ -52,33 +50,34 @@ public class IndexerService implements Indexer {
     }
 
     @Override
-    public HashMap<Document, Double> search(final List<Document> docs, final String query) {
+    public Map<Document, Double> search(final List<Document> docs, final String query) {
         final HashMap<Document, Double> hits = new HashMap<>();
         for (final String q : getWords(query).toArray(String[]::new)) {
             final double idf = idf(docs, q);
             for (final Document doc : docs) {
-                final HashMap<String, Term> terms = doc.getTerms();
-
-                if (terms.containsKey(q)) {
-                    final double tfIdf = idf * terms.get(q).getFrequency();
+                if (doc.terms.containsKey(q)) {
+                    final double tfIdf = idf * doc.terms.get(q).frequency;
                     final double currentRanking = hits.getOrDefault(doc, 0.0);
                     hits.put(doc, currentRanking + tfIdf);
                 }
             }
         }
 
-        return hits;
+        return hits.entrySet().stream()
+                        .sorted((a, b) -> a.getValue() > b.getValue() ? -1 : 1)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                                (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     @Override
     public void publish(final Index i, final Document d) {
-        i.getDocs().add(d);
+        i.docs.add(d);
     }
 
     private double idf(final List<Document> docs, final String term) {
         double n = 0;
         for (final Document doc : docs) {
-            if (doc.getTerms().containsKey(term)) {
+            if (doc.terms.containsKey(term)) {
                 n++;
                 break;
             }

@@ -7,15 +7,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Repo implements IRepo {
-    private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerService.class);
 
     private Set<String> urlDone;
-    private Set<String> urlDoing;
     private Set<String> urlTodo;
 
     public Repo() {
         urlDone = new LinkedHashSet<>();
-        urlDoing = new LinkedHashSet<>();
         urlTodo = new LinkedHashSet<>();
     }
 
@@ -25,7 +23,7 @@ public class Repo implements IRepo {
             if (url == null || url.isEmpty())
                 continue;
 
-            if (!urlDone.contains(url) && !urlDoing.contains(url))
+            if (!urlDone.contains(url))
                 urlTodo.add(url);
         }
     }
@@ -37,9 +35,10 @@ public class Repo implements IRepo {
             String url = urlTodo.iterator().next();
             urlTodo.remove(url);
             urlDone.add(url);
+            LOGGER.info("Repo still contains {} links", urlTodo.size());
             return url;
         }
-        logger.warn("No more url to analyse.");
+        LOGGER.warn("No more url to analyse.");
         return null;
     }
 }
