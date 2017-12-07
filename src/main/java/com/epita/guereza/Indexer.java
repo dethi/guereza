@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
@@ -67,14 +66,14 @@ public class Indexer {
         return Math.log(docs.size() / (1 + n));
     }
 
-    String[] getSentences(String text) {
+    private String[] getSentences(String text) {
         return Arrays.stream(text.split("[.!?]"))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toArray(String[]::new);
     }
 
-    Stream<String> getWords(String sentence) {
+    private Stream<String> getWords(String sentence) {
         return Arrays.stream(sentence.split("\\s+"))
                 .map(String::toLowerCase)
                 .map(s -> Normalizer.normalize(s, Normalizer.Form.NFD))
@@ -84,11 +83,11 @@ public class Indexer {
                 .filter(w -> !StopWords.match(w));
     }
 
-    String stemmed(String word) {
+    private String stemmed(String word) {
         return word.replaceAll("([oi])es$", "$1")
                 .replaceAll("(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$", "")
                 .replaceAll("y$", "i")
-                .replaceAll("(b|d|f|g|m|n|p|r|t){2}$", "$1");
+                .replaceAll("([bdfgmnprt]){2}$", "$1");
     }
 
     public void publish(Index i, Document d) {
