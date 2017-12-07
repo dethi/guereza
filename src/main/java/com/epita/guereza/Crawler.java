@@ -22,13 +22,13 @@ public class Crawler implements ICrawler {
     }
 
     @Override
-    public String[] extractUrl(RawDocument d) {
-        Elements elts = d.getDoc().select("a");
+    public String[] extractUrl(final RawDocument d) {
+        final Elements elts = d.getDoc().select("a");
         return elts.stream().map((e) -> e.absUrl("href")).toArray(String[]::new);
     }
 
     @Override
-    public String extractText(RawDocument d) {
+    public String extractText(final RawDocument d) {
         return d.getDoc().text();
     }
 }

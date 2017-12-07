@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class Indexer implements IIndexer {
     private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
 
+    @Override
     public Document index(final String url) {
         logger.info("indexing {}", url);
         final Crawler c = new Crawler();
@@ -38,6 +39,7 @@ public class Indexer implements IIndexer {
         return new Document(url, terms);
     }
 
+    @Override
     public HashMap<Document, Double> search(final List<Document> docs, final String query) {
         final HashMap<Document, Double> hits = new HashMap<>();
         for (final String q : getWords(query).toArray(String[]::new)) {
@@ -54,6 +56,11 @@ public class Indexer implements IIndexer {
         }
 
         return hits;
+    }
+
+    @Override
+    public void publish(final Index i, final Document d) {
+        i.getDocs().add(d);
     }
 
     private double idf(final List<Document> docs, final String term) {
@@ -89,9 +96,5 @@ public class Indexer implements IIndexer {
                 .replaceAll("(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$", "")
                 .replaceAll("y$", "i")
                 .replaceAll("([bdfgmnprt]){2}$", "$1");
-    }
-
-    public void publish(final Index i, final Document d) {
-        i.getDocs().add(d);
     }
 }
