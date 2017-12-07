@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class IndexerService implements Indexer {
     private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
-    private static final String REGEX_PONCTUATION = "[.!?]";
+    private static final String REGEX_PUNCTUATION = "[.!?]";
     private static final String REGEX_SPACE = "\\s+";
     private static final String REGEX_ALPHANUM = "[^-\\dA-Za-z ]";
     private static final String REGEX_SUFFIX_DUPLICATE = "([bdfgmnprt]){2}$";
@@ -33,18 +33,26 @@ public class IndexerService implements Indexer {
             return null;
         final String text = c.extractText(d);
 
-        final String[] sentences = getSentences(text);
-        final Map<String, Long> tokens = Arrays.stream(sentences)
+        final String[] tokensArray = Arrays.stream(getSentences(text))
                 .map(this::getWords)
                 .flatMap(Function.identity())
-                .collect(groupingBy(Function.identity(), counting()));
+                .toArray(String[]::new);
 
-        final long totalTokens = tokens.values().stream().mapToLong(i -> i).sum();
+        final Map<String, List<Integer>> tokens = new HashMap<>();
+        for (int i = 0; i < tokensArray.length; i++) {
+            if (tokens.containsKey(tokensArray[i])) {
+                tokens.get(tokensArray[i]).add(i);
+            } else {
+                tokens.put(tokensArray[i], new ArrayList<>(i));
+            }
+        }
+
+        final long totalTokens = tokens.values().stream().mapToLong(List::size).sum();
 
         final HashMap<String, Term> terms = new HashMap<>();
-        for (final Map.Entry<String, Long> entry : tokens.entrySet()) {
-            terms.put(entry.getKey(), new Term(entry.getKey(), null,
-                    (double) entry.getValue() / (double) totalTokens));
+        for (final Map.Entry<String, List<Integer>> entry : tokens.entrySet()) {
+            terms.put(entry.getKey(), new Term(entry.getKey(), entry.getValue(),
+                    (double) entry.getValue().size() / (double) totalTokens));
         }
         return new Document(url, terms);
     }
@@ -86,7 +94,7 @@ public class IndexerService implements Indexer {
     }
 
     private String[] getSentences(final String text) {
-        return Arrays.stream(text.split(REGEX_PONCTUATION))
+        return Arrays.stream(text.split(REGEX_PUNCTUATION))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toArray(String[]::new);
