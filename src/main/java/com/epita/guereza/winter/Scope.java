@@ -16,10 +16,10 @@ public class Scope {
     }
 
     public <BEAN_TYPE> void bean(final Class<BEAN_TYPE> klass, final BEAN_TYPE instance) {
-        provider(klass, new Singleton<>(instance));
+        provide(klass, new Singleton<>(instance));
     }
 
-    public <BEAN_TYPE> void provider(final Class<BEAN_TYPE> klass, final Provider provider) {
+    public <BEAN_TYPE> void provide(final Class<BEAN_TYPE> klass, final Provider provider) {
         providers.put(klass, provider);
     }
 }

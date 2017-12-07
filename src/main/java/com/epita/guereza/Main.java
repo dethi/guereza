@@ -32,8 +32,8 @@ public class Main {
         Scope scope = new Scope();
 
         scope.bean(Repo.class, repo);
-        scope.provider(Repo.class, new Singleton<>(repo));
-        scope.provider(Repo.class, new Prototype<>((s) -> new RepoStore()));
+        scope.provide(Repo.class, new Singleton<>(repo));
+        scope.provide(Repo.class, new Prototype<>((s) -> new RepoStore()));
 
         scope.instanceOf(Repo.class);
     }
