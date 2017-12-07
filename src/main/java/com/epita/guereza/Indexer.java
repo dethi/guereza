@@ -16,9 +16,11 @@ public class Indexer {
     private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
 
     public Document index(String url) {
-        logger.info("logging {}", url);
+        logger.info("indexing {}", url);
         Crawler c = new Crawler();
         RawDocument d = c.crawl(url);
+        if (d == null)
+            return null;
         String text = c.extractText(d);
 
         String[] sentences = getSentences(text);
@@ -31,7 +33,7 @@ public class Indexer {
 
         HashMap<String, Term> terms = new HashMap<>();
         for (Map.Entry<String, Long> entry: tokens.entrySet()) {
-            terms.put(entry.getKey(), new Term(entry.getKey(), null, entry.getValue() / totalTokens));
+            terms.put(entry.getKey(), new Term(entry.getKey(), null, (double)entry.getValue() / (double)totalTokens));
         }
         return new Document(url, terms);
     }
@@ -39,6 +41,7 @@ public class Indexer {
     public HashMap<Document, Double> search(List<Document> docs, String query) {
         HashMap<Document, Double> hits = new HashMap<>();
         for (String q : query.split("\\s+")) {
+            q = stemmed(q);
             double idf = idf(docs, q);
             for (Document doc : docs) {
                 HashMap<String, Term> terms = doc.getTerms();
@@ -82,13 +85,13 @@ public class Indexer {
     }
 
     String stemmed(String word) {
-        return word.replaceAll("(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$", "")
+        return word.replaceAll("([oi])es$", "$1")
+                .replaceAll("(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$", "")
                 .replaceAll("y$", "i")
-                .replaceAll("(b|d|f|g|m|n|p|r|t){2}$", "$1")
-                .replaceAll("ies$", "i");
+                .replaceAll("(b|d|f|g|m|n|p|r|t){2}$", "$1");
     }
 
-    public void publish(Document d) {
-
+    public void publish(Index i, Document d) {
+        i.getDocs().add(d);
     }
 }
