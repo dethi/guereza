@@ -29,7 +29,8 @@ public class Main {
         IndexerService indexer = new IndexerService();
 
         String url = repo.nextUrl();
-        while (url != null) {
+        int limit = 200;
+        while (url != null && limit-- > 0) {
             Document d = indexer.index(url);
             url = repo.nextUrl();
 
