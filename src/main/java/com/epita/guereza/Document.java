@@ -1,12 +1,12 @@
 package com.epita.guereza;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class Document {
     private final String url;
-    private final List<Term> terms;
+    private final HashMap<String, Term> terms;
 
-    public Document(final String url, final List<Term> terms) {
+    public Document(final String url, final HashMap<String, Term> terms) {
         this.url = url;
         this.terms = terms;
     }
@@ -15,7 +15,7 @@ public class Document {
         return url;
     }
 
-    public List<Term> getTerms() {
+    public HashMap<String, Term> getTerms() {
         return terms;
     }
 }

@@ -29,24 +29,39 @@ public class Indexer {
 
         Long totalTokens = tokens.values().stream().mapToLong(i -> i).sum();
 
-        List<Term> terms = new ArrayList<>();
+        HashMap<String, Term> terms = new HashMap<>();
         for (Map.Entry<String, Long> entry: tokens.entrySet()) {
-            terms.add(new Term(entry.getKey(), null, entry.getValue() / totalTokens));
+            terms.put(entry.getKey(), new Term(entry.getKey(), null, entry.getValue() / totalTokens));
         }
         return new Document(url, terms);
     }
 
-    private double idf(String[][] sentences, String term) {
-        double n = 0;
-        for (String[] sentence : sentences) {
-            for (String word : sentence) {
-                if (term.equalsIgnoreCase(word)) {
-                    n++;
-                    break;
+    public HashMap<Document, Double> search(List<Document> docs, String query) {
+        HashMap<Document, Double> hits = new HashMap<>();
+        for (String q : query.split("\\s+")) {
+            double idf = idf(docs, q);
+            for (Document doc : docs) {
+                HashMap<String, Term> terms = doc.getTerms();
+                if (terms.containsKey(q)) {
+                    double tfIdf = idf * terms.get(q).getFrequency();
+                    double currentRanking = hits.getOrDefault(doc, 0.0);
+                    hits.put(doc, currentRanking + tfIdf);
                 }
             }
         }
-        return Math.log(sentences.length / n);
+
+        return hits;
+    }
+
+    private double idf(List<Document> docs, String term) {
+        double n = 0;
+        for (Document doc : docs) {
+            if (doc.getTerms().containsKey(term)) {
+                n++;
+                break;
+            }
+        }
+        return Math.log(docs.size() / (1 + n));
     }
 
     String[] getSentences(String text) {
