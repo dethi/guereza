@@ -1,5 +1,10 @@
 package com.epita.guereza;
 
+import com.epita.guereza.crawler.Crawler;
+import com.epita.guereza.crawler.RawDocument;
+import com.epita.guereza.indexer.Document;
+import com.epita.guereza.indexer.Index;
+import com.epita.guereza.indexer.Indexer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +17,11 @@ public class Main {
     public static void main(String[] args) {
         logger.debug("Starting crawler");
 
+        //testTfIdf();
+        testCrawl("https://en.wikipedia.org/wiki/Halifax_Explosion");
+    }
 
+    public static void testTfIdf() {
         Index index = new Index();
         Repo repo = new Repo();
 
@@ -39,61 +48,13 @@ public class Main {
         for (Map.Entry<Document, Double> doc: res.entrySet()) {
             System.out.printf("%100s %f\n", doc.getKey().getUrl(), doc.getValue());
         }
+    }
 
-        /*
-        String[] words = new String[] {
-                        "consign",
-                        "consigned",
-                        "consigning",
-                        "consignment",
-                        "consist",
-                        "consisted",
-                        "consistency",
-                        "consistent",
-                        "consistently",
-                        "consisting",
-                        "consists",
-                        "consolation",
-                        "consolations",
-                        "consolatory",
-                        "console",
-                        "consoled",
-                        "consoles",
-                        "consolidate",
-                        "consolidated",
-                        "consolidating",
-                        "consoling",
-                        "consolingly",
-                        "consols",
-                        "consonant",
-                        "consort",
-                        "consorted",
-                        "consorting",
-                        "conspicuous",
-                        "conspicuously",
-                        "conspiracy",
-                        "conspirator",
-                        "conspirators",
-                        "conspire",
-                        "conspired",
-                        "conspiring",
-                        "constable",
-                        "constables",
-                        "constance",
-                        "constancy",
-                        "constant",
-                        "knottlaa",
-                        "knottly",
-                        "knott"
-        };
-        for (String w: words) {
-            System.out.println(indexer.stemmed(w));
-        }
-        */
+    public static void testCrawl(final String startUrl) {
+        Repo repo = new Repo();
+        repo.store(new String[]{ startUrl });
+        Crawler crawler = new Crawler();
 
-        //Crawler crawler = new Crawler();
-
-        /*
         while (true) {
             String url = repo.nextUrl();
             if (url == null)
@@ -106,6 +67,5 @@ public class Main {
             String[] urls = crawler.extractUrl(doc);
             repo.store(urls);
         }
-        */
     }
 }

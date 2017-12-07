@@ -1,4 +1,4 @@
-package com.epita.guereza;
+package com.epita.guereza.indexer;
 
 import java.util.ArrayList;
 import java.util.List;

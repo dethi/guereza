@@ -1,5 +1,7 @@
-package com.epita.guereza;
+package com.epita.guereza.indexer;
 
+import com.epita.guereza.crawler.Crawler;
+import com.epita.guereza.crawler.RawDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

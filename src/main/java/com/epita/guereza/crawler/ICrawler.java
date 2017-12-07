@@ -1,4 +1,4 @@
-package com.epita.guereza;
+package com.epita.guereza.crawler;
 
 
 public interface ICrawler {
