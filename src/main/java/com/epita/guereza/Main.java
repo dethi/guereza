@@ -21,7 +21,7 @@ public class Main {
         testCrawl("https://en.wikipedia.org/wiki/Halifax_Explosion");
     }
 
-    public static void testTfIdf() {
+    private static void testTfIdf() {
         Index index = new Index();
         Repo repo = new Repo();
 
@@ -50,7 +50,7 @@ public class Main {
         }
     }
 
-    public static void testCrawl(final String startUrl) {
+    private static void testCrawl(final String startUrl) {
         Repo repo = new Repo();
         repo.store(new String[]{ startUrl });
         Crawler crawler = new Crawler();
