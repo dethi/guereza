@@ -17,14 +17,14 @@ public interface Indexer {
      * Add a document to the index
      *
      * @param index The index
-     * @param doc The doc to store
+     * @param doc   The doc to store
      */
     void publish(final Index index, final Document doc);
 
     /**
      * Search a query in a list of document
      *
-     * @param docs The list of documents
+     * @param docs  The list of documents
      * @param query The string query to search
      * @return The document map result
      */

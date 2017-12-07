@@ -55,6 +55,11 @@ public class IndexerService implements Indexer {
     }
 
     @Override
+    public void publish(final Index i, final Document d) {
+        i.docs.add(d);
+    }
+
+    @Override
     public Map<Document, Double> search(final List<Document> docs, final String query) {
         final HashMap<Document, Double> hits = new HashMap<>();
         for (final String q : getWords(query).toArray(String[]::new)) {
@@ -72,11 +77,6 @@ public class IndexerService implements Indexer {
                 .sorted((a, b) -> a.getValue() > b.getValue() ? -1 : 1)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (e1, e2) -> e1, LinkedHashMap::new));
-    }
-
-    @Override
-    public void publish(final Index i, final Document d) {
-        i.docs.add(d);
     }
 
     private double idf(final List<Document> docs, final String term) {

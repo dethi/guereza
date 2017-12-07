@@ -4,7 +4,9 @@ import com.epita.guereza.domain.Document;
 import com.epita.guereza.domain.Index;
 import com.epita.guereza.domain.RawDocument;
 import com.epita.guereza.indexer.IndexerService;
+import com.epita.guereza.winter.Prototype;
 import com.epita.guereza.winter.Scope;
+import com.epita.guereza.winter.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +30,12 @@ public class Main {
 
     private static void testWinter(final Repo repo) {
         Scope scope = new Scope();
-        scope.bean(Repo.class, repo);
 
-        final Repo r = scope.instanceOf(Repo.class);
-        System.out.println(r.nextUrl());
+        scope.bean(Repo.class, repo);
+        scope.provider(Repo.class, new Singleton<>(repo));
+        scope.provider(Repo.class, new Prototype<>((s) -> new RepoStore()));
+
+        scope.instanceOf(Repo.class);
     }
 
     private static void testCrawl(final Repo repo) {
