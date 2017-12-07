@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class Scope {
-    private final Map<Class, Provider> providers = new HashMap<>();
+    private final Map<Class<?>, Provider<?>> providers = new HashMap<>();
 
     public <BEAN_TYPE> BEAN_TYPE instanceOf(final Class<BEAN_TYPE> klass) {
         if (!providers.containsKey(klass)) {
