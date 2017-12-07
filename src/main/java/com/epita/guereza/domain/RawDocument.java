@@ -1,4 +1,4 @@
-package com.epita.guereza.crawler;
+package com.epita.guereza.domain;
 
 import org.jsoup.nodes.Document;
 

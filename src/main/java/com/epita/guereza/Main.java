@@ -1,10 +1,9 @@
 package com.epita.guereza;
 
-import com.epita.guereza.crawler.Crawler;
-import com.epita.guereza.crawler.RawDocument;
-import com.epita.guereza.indexer.Document;
-import com.epita.guereza.indexer.Index;
-import com.epita.guereza.indexer.Indexer;
+import com.epita.guereza.domain.Document;
+import com.epita.guereza.domain.Index;
+import com.epita.guereza.domain.RawDocument;
+import com.epita.guereza.indexer.IndexerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,7 @@ public class Main {
                 "http://www.delish.com/cooking/g1448/quick-easy-tomato-recipes/",
                 "https://www.bbc.co.uk/food/recipes/saladenicoise_6572"
         });
-        Indexer indexer = new Indexer();
+        IndexerService indexer = new IndexerService();
 
         String url = repo.nextUrl();
         while (url != null) {
@@ -45,15 +44,15 @@ public class Main {
         }
 
         HashMap<Document, Double> res = indexer.search(index.getDocs(), "tomatoes");
-        for (Map.Entry<Document, Double> doc: res.entrySet()) {
+        for (Map.Entry<Document, Double> doc : res.entrySet()) {
             System.out.printf("%100s %f\n", doc.getKey().getUrl(), doc.getValue());
         }
     }
 
     private static void testCrawl(final String startUrl) {
         Repo repo = new Repo();
-        repo.store(new String[]{ startUrl });
-        Crawler crawler = new Crawler();
+        repo.store(new String[]{startUrl});
+        CrawlerService crawler = new CrawlerService();
 
         while (true) {
             String url = repo.nextUrl();

@@ -1,25 +1,35 @@
 package com.epita.guereza.indexer;
 
-import com.epita.guereza.crawler.Crawler;
-import com.epita.guereza.crawler.RawDocument;
+import com.epita.guereza.CrawlerService;
+import com.epita.guereza.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.Normalizer;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
-public class Indexer implements IIndexer {
-    private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
+public class IndexerService implements Indexer {
+    private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
+    private static final String REGEX_PONCTUATION = "[.!?]";
+    private static final String REGEX_SPACE = "\\s+";
+    private static final String REGEX_ALPHANUM = "[^-\\dA-Za-z ]";
+    private static final String REGEX_SUFFIX_DUPLICATE = "([bdfgmnprt]){2}$";
+    private static final String REGEX_SUFFIX_LONG = "(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$";
+    private static final String REGEX_SUFFIX_VOWELS = "([oi])es$";
+
 
     @Override
     public Document index(final String url) {
         logger.info("indexing {}", url);
-        final Crawler c = new Crawler();
+        final CrawlerService c = new CrawlerService();
         final RawDocument d = c.crawl(url);
         if (d == null)
             return null;
@@ -34,9 +44,9 @@ public class Indexer implements IIndexer {
         final long totalTokens = tokens.values().stream().mapToLong(i -> i).sum();
 
         final HashMap<String, Term> terms = new HashMap<>();
-        for (final Map.Entry<String, Long> entry: tokens.entrySet()) {
+        for (final Map.Entry<String, Long> entry : tokens.entrySet()) {
             terms.put(entry.getKey(), new Term(entry.getKey(), null,
-                    (double)entry.getValue() / (double)totalTokens));
+                    (double) entry.getValue() / (double) totalTokens));
         }
         return new Document(url, terms);
     }
@@ -77,26 +87,26 @@ public class Indexer implements IIndexer {
     }
 
     private String[] getSentences(final String text) {
-        return Arrays.stream(text.split("[.!?]"))
+        return Arrays.stream(text.split(REGEX_PONCTUATION))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toArray(String[]::new);
     }
 
     private Stream<String> getWords(final String sentence) {
-        return Arrays.stream(sentence.split("\\s+"))
+        return Arrays.stream(sentence.split(REGEX_SPACE))
                 .map(String::toLowerCase)
                 .map(s -> Normalizer.normalize(s, Normalizer.Form.NFD))
-                .map(s -> s.replaceAll("[^-\\dA-Za-z ]", ""))
+                .map(s -> s.replaceAll(REGEX_ALPHANUM, ""))
                 .map(this::stemmed)
                 .filter(s -> !s.isEmpty())
                 .filter(w -> !StopWords.match(w));
     }
 
     private String stemmed(final String word) {
-        return word.replaceAll("([oi])es$", "$1")
-                .replaceAll("(ing|ed|ly|ment|ency|ation|s|ent|e|ous|ator)$", "")
+        return word.replaceAll(REGEX_SUFFIX_VOWELS, "$1")
+                .replaceAll(REGEX_SUFFIX_LONG, "")
                 .replaceAll("y$", "i")
-                .replaceAll("([bdfgmnprt]){2}$", "$1");
+                .replaceAll(REGEX_SUFFIX_DUPLICATE, "$1");
     }
 }

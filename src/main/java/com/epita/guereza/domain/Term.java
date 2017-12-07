@@ -1,4 +1,4 @@
-package com.epita.guereza.indexer;
+package com.epita.guereza.domain;
 
 public class Term {
     private final String token;

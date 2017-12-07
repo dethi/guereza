@@ -1,7 +1,7 @@
-package com.epita.guereza.crawler;
+package com.epita.guereza.domain;
 
 
-public interface ICrawler {
+public interface Crawler {
     RawDocument crawl(final String url);
 
     String[] extractUrl(RawDocument doc);

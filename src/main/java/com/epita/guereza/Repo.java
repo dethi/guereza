@@ -1,6 +1,5 @@
 package com.epita.guereza;
 
-import com.epita.guereza.crawler.Crawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,13 +7,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Repo implements IRepo {
-    private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
+    private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
 
     private Set<String> urlDone;
     private Set<String> urlDoing;
     private Set<String> urlTodo;
 
-    public Repo () {
+    public Repo() {
         urlDone = new LinkedHashSet<>();
         urlDoing = new LinkedHashSet<>();
         urlTodo = new LinkedHashSet<>();
@@ -22,7 +21,7 @@ public class Repo implements IRepo {
 
     @Override
     public void store(String[] urls) {
-        for (String url: urls) {
+        for (String url : urls) {
             if (url == null || url.isEmpty())
                 continue;
 
