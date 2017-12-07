@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
-public class Indexer {
+public class Indexer implements IIndexer {
     private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
 
     public Document index(final String url) {
