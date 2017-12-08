@@ -33,10 +33,17 @@ public class Scope {
         }
     }
 
+    public Scope scope() {
+        return new Scope(this);
+    }
+
     @SuppressWarnings("unchecked")
     public <BEAN_TYPE> BEAN_TYPE instanceOf(final Class<BEAN_TYPE> klass) {
-        if (!providers.containsKey(klass)) {
+        if (parent == null && !providers.containsKey(klass)) {
             throw new NoSuchElementException();
+        }
+        if (parent != null && !providers.containsKey(klass)) {
+            return parent.instanceOf(klass);
         }
 
         Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);

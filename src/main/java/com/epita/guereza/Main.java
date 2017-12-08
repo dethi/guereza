@@ -108,10 +108,12 @@ public class Main {
                 .block((s) -> {
                     Repo r = s.instanceOf(Repo.class);
                     System.out.println(r.nextUrl());
+                    s.instanceOf(Indexer.class);
 
-                    s.instanceOf(Indexer.class);
-                    s.instanceOf(Indexer.class);
-                    s.instanceOf(Indexer.class);
+                    s.scope().register(new Singleton<>(Repo.class, new RepoStore())).block((s2) -> {
+                        Repo r2 = s2.instanceOf(Repo.class);
+                        System.out.println(r2.nextUrl());
+                    });
                 });
     }
 
