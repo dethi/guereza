@@ -1,4 +1,4 @@
-package com.epita.guereza.winter;
+package com.epita.guereza.winter.aspect;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

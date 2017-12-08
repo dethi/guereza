@@ -46,11 +46,14 @@ public class Main {
                     Object s = context.call();
                     System.out.println("AroundAfter2::");
                     return s;
-                });
+                })
+                .beforeDestroy((s) -> System.out.println("Destroy::"));
 
         Repo r = scope.instanceOf(Repo.class);
         System.out.println(r.nextUrl());
         r.store(new String[]{"yolo"});
+
+        scope.unregister(Repo.class);
     }
 
     private static void testCrawl(final Repo repo) {

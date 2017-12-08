@@ -1,8 +1,8 @@
 package com.epita.guereza.winter.provider;
 
-import com.epita.guereza.winter.Aspect;
-import com.epita.guereza.winter.AspectContext;
 import com.epita.guereza.winter.Scope;
+import com.epita.guereza.winter.aspect.AspectContext;
+import com.epita.guereza.winter.aspect.AspectInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
@@ -18,13 +19,14 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> afterConsumers = new LinkedHashMap<>();
     private final Map<Method, List<Function<AspectContext, Object>>> aroundFunctions = new LinkedHashMap<>();
     private final List<BiConsumer<Scope, BEAN_TYPE>> afterCreateConsumers = new ArrayList<>();
+    private final List<Consumer<Scope>> beforeDestroyConsumers = new ArrayList<>();
 
     Class<BEAN_TYPE> klass;
 
     protected abstract BEAN_TYPE createInstance(final Scope scope);
 
-    private Aspect getAspect(final Scope scope, final BEAN_TYPE target) {
-        return new Aspect<>(beforeConsumers, afterConsumers, aroundFunctions, scope, target);
+    private AspectInvocationHandler getAspectInvocationHandler(final Scope scope, final BEAN_TYPE target) {
+        return new AspectInvocationHandler<>(beforeConsumers, afterConsumers, aroundFunctions, scope, target);
     }
 
     public BEAN_TYPE getInstance(final Class<BEAN_TYPE> klass, final Scope scope) {
@@ -34,7 +36,7 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
         }
 
         Object proxy = Proxy.newProxyInstance(
-                klass.getClassLoader(), new Class<?>[]{klass}, getAspect(scope, target));
+                klass.getClassLoader(), new Class<?>[]{klass}, getAspectInvocationHandler(scope, target));
         return klass.cast(proxy);
     }
 
@@ -45,11 +47,6 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
 
     public Provider<BEAN_TYPE> before(final Method method, final BiConsumer<Scope, BEAN_TYPE> consumer) {
         register(beforeConsumers, method, consumer);
-        return this;
-    }
-
-    public Provider<BEAN_TYPE> after(final Method method, final BiConsumer<Scope, BEAN_TYPE> consumer) {
-        register(afterConsumers, method, consumer);
         return this;
     }
 
@@ -66,7 +63,23 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
         return this;
     }
 
-    void callAfterCreate(Scope scope, BEAN_TYPE target) {
+    public Provider<BEAN_TYPE> after(final Method method, final BiConsumer<Scope, BEAN_TYPE> consumer) {
+        register(afterConsumers, method, consumer);
+        return this;
+    }
+
+    public Provider<BEAN_TYPE> beforeDestroy(final Consumer<Scope> consumer) {
+        beforeDestroyConsumers.add(consumer);
+        return this;
+    }
+
+    public void unregister(final Scope scope) {
+        for (Consumer<Scope> consumer : beforeDestroyConsumers) {
+            consumer.accept(scope);
+        }
+    }
+
+    void callAfterCreate(final Scope scope, final BEAN_TYPE target) {
         for (BiConsumer<Scope, BEAN_TYPE> consumer : afterCreateConsumers) {
             consumer.accept(scope, target);
         }

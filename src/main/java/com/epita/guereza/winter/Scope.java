@@ -11,7 +11,9 @@ import java.util.NoSuchElementException;
 public class Scope {
     private final Map<Class<?>, Provider<?>> providers = new HashMap<>();
 
-    public static <BEAN_TYPE> Method getMethod(Class<BEAN_TYPE> klass, String name, Class<?>... parameterTypes) {
+    public static <BEAN_TYPE> Method getMethod(final Class<BEAN_TYPE> klass,
+                                               final String name,
+                                               final Class<?>... parameterTypes) {
         try {
             return klass.getMethod(name, parameterTypes);
         } catch (NoSuchMethodException e) {
@@ -30,11 +32,24 @@ public class Scope {
     }
 
     public <BEAN_TYPE> Provider<BEAN_TYPE> bean(final Class<BEAN_TYPE> klass, final BEAN_TYPE instance) {
-        return provide(klass, new Singleton<>(klass, instance));
+        return register(klass, new Singleton<>(klass, instance));
     }
 
-    public <BEAN_TYPE> Provider<BEAN_TYPE> provide(final Class<BEAN_TYPE> klass, final Provider<BEAN_TYPE> provider) {
+    public <BEAN_TYPE> Provider<BEAN_TYPE> register(final Class<BEAN_TYPE> klass, final Provider<BEAN_TYPE> provider) {
         providers.put(klass, provider);
         return provider;
+    }
+
+    public <BEAN_TYPE> void unregister(final Class<BEAN_TYPE> klass) {
+        Provider<?> provider = providers.remove(klass);
+        if (provider != null) {
+            provider.unregister(this);
+        }
+    }
+
+    public void destroy() {
+        for (Provider<?> provider : providers.values()) {
+            provider.unregister(this);
+        }
     }
 }
