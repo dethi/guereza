@@ -7,12 +7,13 @@ import java.util.function.Function;
 public class Prototype<BEAN_TYPE> extends AnyProvider<BEAN_TYPE> {
     private final Function<Scope, BEAN_TYPE> initiator;
 
-    public Prototype(Function<Scope, BEAN_TYPE> initiator) {
+    public Prototype(final Class<BEAN_TYPE> klass, final Function<Scope, BEAN_TYPE> initiator) {
+        this.klass = klass;
         this.initiator = initiator;
     }
 
     @Override
-    public BEAN_TYPE createInstance(final Scope scope) {
+    protected BEAN_TYPE createInstance(final Scope scope) {
         return initiator.apply(scope);
     }
 }

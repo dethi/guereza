@@ -15,6 +15,8 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     private final Map<Method, List<Consumer<Scope>>> beforeConsumers = new HashMap<>();
     private final Map<Method, List<Consumer<Scope>>> afterConsumers = new HashMap<>();
 
+    Class<BEAN_TYPE> klass;
+
     protected abstract BEAN_TYPE createInstance(final Scope scope);
 
     private Aspect getAspect(final Scope scope, final Object target) {
@@ -33,16 +35,25 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     }
 
     public Provider<BEAN_TYPE> before(final Method method, final Consumer<Scope> consumer) {
-        final List<Consumer<Scope>> consumers = beforeConsumers.getOrDefault(method, new ArrayList<>());
-        consumers.add(consumer);
-        beforeConsumers.put(method, consumers);
+        register(beforeConsumers, method, consumer);
         return this;
     }
 
     public Provider<BEAN_TYPE> after(final Method method, final Consumer<Scope> consumer) {
-        final List<Consumer<Scope>> consumers = afterConsumers.getOrDefault(method, new ArrayList<>());
-        consumers.add(consumer);
-        afterConsumers.put(method, consumers);
+        register(afterConsumers, method, consumer);
         return this;
+    }
+
+    private void register(Map<Method, List<Consumer<Scope>>> consumers,
+                          final Method method,
+                          final Consumer<Scope> consumer) {
+
+        if (!klass.isInterface()) {
+            throw new InterfaceRequiredException();
+        }
+
+        final List<Consumer<Scope>> listConsumer = consumers.getOrDefault(method, new ArrayList<>());
+        listConsumer.add(consumer);
+        consumers.put(method, listConsumer);
     }
 }

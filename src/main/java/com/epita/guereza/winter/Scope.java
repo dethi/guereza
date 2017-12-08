@@ -30,7 +30,7 @@ public class Scope {
     }
 
     public <BEAN_TYPE> Provider<BEAN_TYPE> bean(final Class<BEAN_TYPE> klass, final BEAN_TYPE instance) {
-        return provide(klass, new Singleton<>(instance));
+        return provide(klass, new Singleton<>(klass, instance));
     }
 
     public <BEAN_TYPE> Provider<BEAN_TYPE> provide(final Class<BEAN_TYPE> klass, final Provider<BEAN_TYPE> provider) {
