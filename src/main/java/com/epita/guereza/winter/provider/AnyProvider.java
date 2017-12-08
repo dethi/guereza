@@ -44,7 +44,7 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
         return this;
     }
 
-    private void register(Map<Method, List<Consumer<Scope>>> consumers,
+    private void register(final Map<Method, List<Consumer<Scope>>> consumers,
                           final Method method,
                           final Consumer<Scope> consumer) {
 
