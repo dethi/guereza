@@ -10,7 +10,14 @@ import java.util.function.Function;
 public interface Provider<BEAN_TYPE> {
 
     /**
-     * Return an instance created by the provider. The instance could be a proxy object if any
+     * Get the class instance used to create the provider.
+     *
+     * @return The class instance
+     */
+    Class<BEAN_TYPE> getInstanceClass();
+
+    /**
+     * Get an instance created by the provider. The instance could be a proxy object if any
      * around aspect are registered.
      *
      * @param klass The class

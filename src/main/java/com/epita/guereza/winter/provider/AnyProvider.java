@@ -22,10 +22,8 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
 
     Class<BEAN_TYPE> klass;
 
-    protected abstract BEAN_TYPE createInstance(final Scope scope);
-
-    private AspectInvocationHandler getAspectInvocationHandler(final Scope scope, final BEAN_TYPE target) {
-        return new AspectInvocationHandler<>(beforeConsumers, afterConsumers, aroundFunctions, scope, target);
+    public Class<BEAN_TYPE> getInstanceClass() {
+        return klass;
     }
 
     public BEAN_TYPE getInstance(final Class<BEAN_TYPE> klass, final Scope scope) {
@@ -76,6 +74,12 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
         for (BiConsumer<Scope, BEAN_TYPE> consumer : beforeDestroyConsumers) {
             consumer.accept(scope, target);
         }
+    }
+
+    protected abstract BEAN_TYPE createInstance(final Scope scope);
+
+    private AspectInvocationHandler getAspectInvocationHandler(final Scope scope, final BEAN_TYPE target) {
+        return new AspectInvocationHandler<>(beforeConsumers, afterConsumers, aroundFunctions, scope, target);
     }
 
     void callAfterCreate(final Scope scope, final BEAN_TYPE target) {

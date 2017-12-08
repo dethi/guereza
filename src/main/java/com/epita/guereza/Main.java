@@ -2,9 +2,12 @@ package com.epita.guereza;
 
 import com.epita.guereza.domain.Document;
 import com.epita.guereza.domain.Index;
+import com.epita.guereza.domain.Indexer;
 import com.epita.guereza.domain.RawDocument;
 import com.epita.guereza.indexer.IndexerService;
 import com.epita.guereza.winter.Scope;
+import com.epita.guereza.winter.provider.Prototype;
+import com.epita.guereza.winter.provider.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,33 +31,32 @@ public class Main {
     }
 
     private static void testWinter(final Repo repo) {
-        Scope scope = new Scope();
-
         Method method = getMethod(Repo.class, "nextUrl");
-        scope.bean(Repo.class, repo)
-                .before(method, (s, obj) -> System.out.println("before::"))
-                .after(method, (s, obj) -> System.out.println("After::"))
-                .afterCreate((s, obj) -> System.out.println("AfterCreate::"))
-                .around(method, (context) -> {
-                    System.out.println("AroundBefore1::");
-                    Object s = context.call();
-                    System.out.println("AroundAfter1::");
-                    return s;
-                })
-                .around(method, (context) -> {
-                    System.out.println("AroundBefore2::");
-                    Object s = context.call();
-                    System.out.println("AroundAfter2::");
-                    return s;
-                })
-                .beforeDestroy((s, obj) -> System.out.println("Destroy::"));
+        new Scope()
+                .register(
+                        new Singleton<>(Repo.class, repo)
+                                .before(method, (s, obj) -> System.out.println("before::"))
+                                .after(method, (s, obj) -> System.out.println("after::"))
+                                .around(method, (ctx) -> {
+                                    System.out.println("beforeAround::");
+                                    Object obj = ctx.call();
+                                    System.out.println("afterAround::");
+                                    return obj;
+                                })
+                                .beforeDestroy((s, obj) -> System.out.println("destroy::")))
+                .register(
+                        new Prototype<>(Indexer.class, (s) -> new IndexerService())
+                                .afterCreate((s, obj) -> System.out.println("beforeCreate::"))
+                                .beforeDestroy((s, obj) -> System.out.println("destroy::"))
+                )
+                .block((s) -> {
+                    Repo r = s.instanceOf(Repo.class);
+                    System.out.println(r.nextUrl());
 
-        Repo r = scope.instanceOf(Repo.class);
-        System.out.println(r.nextUrl());
-        r.store(new String[]{"yolo"});
-
-        scope.release(Repo.class, r);
-        scope.unregister(Repo.class);
+                    s.instanceOf(Indexer.class);
+                    s.instanceOf(Indexer.class);
+                    s.instanceOf(Indexer.class);
+                });
     }
 
     private static void testCrawl(final Repo repo) {
