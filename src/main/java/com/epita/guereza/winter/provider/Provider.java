@@ -6,9 +6,7 @@ import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 public interface Provider<BEAN_TYPE> {
-    BEAN_TYPE getInstance(final Scope scope);
-
-    Object getInstanceOrProxy(final Class<?> klass, final Scope scope);
+    BEAN_TYPE getInstance(final Class<BEAN_TYPE> klass, final Scope scope);
 
     Provider<BEAN_TYPE> before(final Method method, final Consumer<Scope> consumer);
 

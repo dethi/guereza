@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import static com.epita.guereza.winter.Scope.getMethod;
+
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
@@ -28,7 +30,7 @@ public class Main {
     private static void testWinter(final Repo repo) {
         Scope scope = new Scope();
 
-        Method method = Scope.getMethod(Repo.class, "nextUrl");
+        Method method = getMethod(Repo.class, "nextUrl");
         scope.bean(Repo.class, repo)
                 .before(method, (s) -> System.out.println("before::"))
                 .after(method, (s) -> System.out.println("After1::"))

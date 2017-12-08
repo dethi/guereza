@@ -15,17 +15,21 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     private final Map<Method, List<Consumer<Scope>>> beforeConsumers = new HashMap<>();
     private final Map<Method, List<Consumer<Scope>>> afterConsumers = new HashMap<>();
 
+    protected abstract BEAN_TYPE createInstance(final Scope scope);
+
     private Aspect getAspect(final Scope scope, final Object target) {
         return new Aspect(beforeConsumers, afterConsumers, scope, target);
     }
 
-    public Object getInstanceOrProxy(final Class<?> klass, final Scope scope) {
-        Object target = getInstance(scope);
+    public BEAN_TYPE getInstance(final Class<BEAN_TYPE> klass, final Scope scope) {
+        BEAN_TYPE target = createInstance(scope);
         if (beforeConsumers.size() == 0 && afterConsumers.size() == 0) {
             return target;
         }
 
-        return Proxy.newProxyInstance(klass.getClassLoader(), new Class<?>[]{klass}, getAspect(scope, target));
+        Object proxy = Proxy.newProxyInstance(
+                klass.getClassLoader(), new Class<?>[]{klass}, getAspect(scope, target));
+        return klass.cast(proxy);
     }
 
     public Provider<BEAN_TYPE> before(final Method method, final Consumer<Scope> consumer) {

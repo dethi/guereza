@@ -19,13 +19,14 @@ public class Scope {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <BEAN_TYPE> BEAN_TYPE instanceOf(final Class<BEAN_TYPE> klass) {
         if (!providers.containsKey(klass)) {
             throw new NoSuchElementException();
         }
 
-        Object proxy = providers.get(klass).getInstanceOrProxy(klass, this);
-        return klass.cast(proxy);
+        Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);
+        return provider.getInstance(klass, this);
     }
 
     public <BEAN_TYPE> Provider<BEAN_TYPE> bean(final Class<BEAN_TYPE> klass, final BEAN_TYPE instance) {
