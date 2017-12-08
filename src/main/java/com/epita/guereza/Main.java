@@ -47,12 +47,13 @@ public class Main {
                     System.out.println("AroundAfter2::");
                     return s;
                 })
-                .beforeDestroy((s) -> System.out.println("Destroy::"));
+                .beforeDestroy((s, obj) -> System.out.println("Destroy::"));
 
         Repo r = scope.instanceOf(Repo.class);
         System.out.println(r.nextUrl());
         r.store(new String[]{"yolo"});
 
+        scope.release(Repo.class, r);
         scope.unregister(Repo.class);
     }
 

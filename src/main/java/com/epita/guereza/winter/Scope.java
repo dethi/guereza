@@ -41,15 +41,14 @@ public class Scope {
     }
 
     public <BEAN_TYPE> void unregister(final Class<BEAN_TYPE> klass) {
-        Provider<?> provider = providers.remove(klass);
-        if (provider != null) {
-            provider.unregister(this);
-        }
+        providers.remove(klass);
     }
 
-    public void destroy() {
-        for (Provider<?> provider : providers.values()) {
-            provider.unregister(this);
+    @SuppressWarnings("unchecked")
+    public <BEAN_TYPE> void release(final Class<BEAN_TYPE> klass, final BEAN_TYPE target) {
+        if (providers.containsKey(klass)) {
+            Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);
+            provider.callAfterDestroy(this, target);
         }
     }
 }

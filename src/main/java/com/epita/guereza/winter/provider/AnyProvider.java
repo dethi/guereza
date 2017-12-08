@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
@@ -19,7 +18,7 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> afterConsumers = new LinkedHashMap<>();
     private final Map<Method, List<Function<AspectContext, Object>>> aroundFunctions = new LinkedHashMap<>();
     private final List<BiConsumer<Scope, BEAN_TYPE>> afterCreateConsumers = new ArrayList<>();
-    private final List<Consumer<Scope>> beforeDestroyConsumers = new ArrayList<>();
+    private final List<BiConsumer<Scope, BEAN_TYPE>> beforeDestroyConsumers = new ArrayList<>();
 
     Class<BEAN_TYPE> klass;
 
@@ -68,14 +67,14 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
         return this;
     }
 
-    public Provider<BEAN_TYPE> beforeDestroy(final Consumer<Scope> consumer) {
+    public Provider<BEAN_TYPE> beforeDestroy(final BiConsumer<Scope, BEAN_TYPE> consumer) {
         beforeDestroyConsumers.add(consumer);
         return this;
     }
 
-    public void unregister(final Scope scope) {
-        for (Consumer<Scope> consumer : beforeDestroyConsumers) {
-            consumer.accept(scope);
+    public void callAfterDestroy(final Scope scope, final BEAN_TYPE target) {
+        for (BiConsumer<Scope, BEAN_TYPE> consumer : beforeDestroyConsumers) {
+            consumer.accept(scope, target);
         }
     }
 
