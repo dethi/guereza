@@ -4,30 +4,118 @@ import com.epita.guereza.domain.Document;
 import com.epita.guereza.domain.Index;
 import com.epita.guereza.domain.Indexer;
 import com.epita.guereza.domain.RawDocument;
+import com.epita.guereza.eventbus.*;
 import com.epita.guereza.indexer.IndexerService;
 import com.epita.guereza.winter.Scope;
 import com.epita.guereza.winter.provider.Prototype;
 import com.epita.guereza.winter.provider.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 import static com.epita.guereza.winter.Scope.getMethod;
 
 public class Main {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final String NETTY_HOST = "localhost";
+    private static final int NETTY_PORT = 8000;
 
     public static void main(String[] args) {
         final Index index = new Index();
         final Repo repo = new RepoStore();
 
-        repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
-        testWinter(repo);
+        //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
+        //testWinter(repo);
+
+        boolean server = false;
+        boolean client = true;
+        if (server) {
+            client();
+        } else {
+            server();
+        }
+        //testEventBusClientSubscribe();
         //testCrawl(repo);
         //testIndexing(repo, index);
         //testSearch(index, "onions courgettes pepper");
+    }
+
+    private static void client() {
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            Bootstrap bootstrap = new io.netty.bootstrap.Bootstrap()
+                    .group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ChatClientInitializer());
+
+            Channel channel = bootstrap.connect(NETTY_HOST, NETTY_PORT).sync().channel();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Client ready");
+            while (true) {
+                String msg = in.readLine();
+                channel.writeAndFlush(msg + "\r\n");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            group.shutdownGracefully();
+        }
+    }
+
+    private static void server() {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap()
+                    .group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ServerInitializer());
+
+            bootstrap.bind(NETTY_PORT).sync().channel().closeFuture().sync();
+            System.out.println("Server ready.");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
+    }
+
+
+    private static void testEventBusClientSubscribe() {
+        NettyEventBusClient nebc = new NettyEventBusClient();
+        final boolean succeed = nebc.run(NETTY_HOST, NETTY_PORT);
+
+        if (succeed) {
+            NettyChannel channel = new NettyChannel("room");
+            nebc.subscribe(new NettyChannel("room"), message -> {
+                System.out.println(message.getContent());
+                nebc.shutdown();
+            });
+            NettyMessage msg = new NettyMessage(channel, "text", "Hi!");
+            //nebc.publish(channel, msg);
+        }
+    }
+
+    private static void testEventBusClientPublish() {
+        NettyEventBusClient nebc = new NettyEventBusClient();
+        final boolean succeed = nebc.run(NETTY_HOST, NETTY_PORT);
+        if (succeed) {
+            NettyChannel channel = new NettyChannel("room");
+            NettyMessage msg = new NettyMessage(channel, "text", "Hi!");
+            nebc.publish(channel, msg);
+            nebc.shutdown();
+        }
     }
 
     private static void testWinter(final Repo repo) {
