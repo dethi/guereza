@@ -5,19 +5,16 @@ import com.epita.guereza.domain.Index;
 import com.epita.guereza.domain.RawDocument;
 import com.epita.guereza.indexer.IndexerService;
 import com.epita.guereza.winter.Scope;
-import com.epita.guereza.winter.provider.Provider;
-import com.epita.guereza.winter.provider.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        logger.debug("Starting crawler");
-
         final Index index = new Index();
         final Repo repo = new RepoStore();
 
@@ -31,17 +28,15 @@ public class Main {
     private static void testWinter(final Repo repo) {
         Scope scope = new Scope();
 
-        //scope.bean(Repo.class, repo);
-        //scope.provide(Repo.class, new Singleton<>(repo));
-        //scope.provide(Repo.class, new Prototype<>((s) -> new RepoStore()));
-
-        Provider<?> provider = new Singleton<>(repo);
-        provider.before(Scope.getMethod(Repo.class, "nextUrl"), (s) -> System.out.println("before::"));
-        provider.after(Scope.getMethod(Repo.class, "nextUrl"), (s) -> System.out.println("after::"));
-        scope.provide(Repo.class, provider);
+        Method method = Scope.getMethod(Repo.class, "nextUrl");
+        scope.bean(Repo.class, repo)
+                .before(method, (s) -> System.out.println("before::"))
+                .after(method, (s) -> System.out.println("After1::"))
+                .after(method, (s) -> System.out.println("After2::"));
 
         Repo r = scope.instanceOf(Repo.class);
         System.out.println(r.nextUrl());
+        r.store(new String[]{"yolo"});
     }
 
     private static void testCrawl(final Repo repo) {
