@@ -1,19 +1,22 @@
 package com.epita.guereza.winter.provider;
 
 import com.epita.guereza.winter.Aspect;
+import com.epita.guereza.winter.AspectContext;
 import com.epita.guereza.winter.Scope;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
-    private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> beforeConsumers = new HashMap<>();
-    private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> afterConsumers = new HashMap<>();
+    private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> beforeConsumers = new LinkedHashMap<>();
+    private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> afterConsumers = new LinkedHashMap<>();
+    private final Map<Method, List<Function<AspectContext, Object>>> aroundFunctions = new LinkedHashMap<>();
     private final List<BiConsumer<Scope, BEAN_TYPE>> afterCreateConsumers = new ArrayList<>();
 
     Class<BEAN_TYPE> klass;
@@ -21,7 +24,7 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     protected abstract BEAN_TYPE createInstance(final Scope scope);
 
     private Aspect getAspect(final Scope scope, final BEAN_TYPE target) {
-        return new Aspect<>(beforeConsumers, afterConsumers, scope, target);
+        return new Aspect<>(beforeConsumers, afterConsumers, aroundFunctions, scope, target);
     }
 
     public BEAN_TYPE getInstance(final Class<BEAN_TYPE> klass, final Scope scope) {
@@ -47,6 +50,19 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
 
     public Provider<BEAN_TYPE> after(final Method method, final BiConsumer<Scope, BEAN_TYPE> consumer) {
         register(afterConsumers, method, consumer);
+        return this;
+    }
+
+    public Provider<BEAN_TYPE> around(final Method method, final Function<AspectContext, Object> consumer) {
+        if (!klass.isInterface()) {
+            throw new InterfaceRequiredException();
+        }
+
+        final List<Function<AspectContext, Object>> listConsumer =
+                aroundFunctions.getOrDefault(method, new ArrayList<>());
+        listConsumer.add(consumer);
+        aroundFunctions.put(method, listConsumer);
+
         return this;
     }
 
