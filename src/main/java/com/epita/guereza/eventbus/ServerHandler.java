@@ -6,16 +6,17 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.DefaultEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerHandler extends SimpleChannelInboundHandler<String> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerHandler.class);
     private static final ChannelGroup channels = new DefaultChannelGroup(new DefaultEventExecutor());
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
-
-        incoming.writeAndFlush("[SERVER] - " + "WELCOME TO THIS SIMPLE CHAT APP!\r\n");
-        System.out.println("handling connection");
+        LOGGER.info("Server: Handling connection");
         channels.add(incoming);
     }
 
@@ -28,9 +29,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
         Channel incoming = channelHandlerContext.channel();
-        System.out.println("Server reading");
+        LOGGER.info("Server reading: {}", s);
         for (Channel channel : channels) {
-            channel.writeAndFlush("Broadcasting: " + s + "\r\n");
+            channel.writeAndFlush(s);
         }
     }
 

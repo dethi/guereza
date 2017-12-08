@@ -1,5 +1,7 @@
 package com.epita.guereza.eventbus;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
@@ -37,6 +39,7 @@ public interface EventBusClient {
     /**
      * Interface for channels.
      */
+    @JsonDeserialize(as = NettyChannel.class)
     interface Channel {
         /**
          * Get the address of the given channel.

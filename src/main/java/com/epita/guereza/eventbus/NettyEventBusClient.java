@@ -1,8 +1,7 @@
 package com.epita.guereza.eventbus;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -17,9 +16,9 @@ import java.util.function.Consumer;
 
 public class NettyEventBusClient implements EventBusClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyEventBusClient.class);
-    private final Map<EventBusClient.Channel, List<Subscription>> subscriptionsMap;
+    private final Map<String, List<Subscription>> subscriptionsMap;
     private io.netty.channel.Channel nettyChannel;
-    private final EventLoopGroup group;
+    private EventLoopGroup group;
 
     public NettyEventBusClient() {
         subscriptionsMap = new HashMap<>();
@@ -36,21 +35,24 @@ public class NettyEventBusClient implements EventBusClient {
         if (nettyChannel != null)
             return false;
 
-        Bootstrap bootstrap = new Bootstrap()
-                .group(group)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new ChatClientInitializer());
-
+        group = new NioEventLoopGroup();
         try {
+            Bootstrap bootstrap = new io.netty.bootstrap.Bootstrap()
+                    .group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new NettyClientInitializer(this::trigger));
+
             nettyChannel = bootstrap.connect(host, port).sync().channel();
+
+
+            System.out.println("Client ready");
         } catch (Exception e) {
             LOGGER.error("EventBusClient: impossible to connect to {}:{}", host, port);
             //e.printStackTrace();
             return false;
         }
+        LOGGER.info("EventBusClient: connected on {}:{}", host, port);
 
-        LOGGER.info("EventBusClient: listening on {}:{}", host, port);
         return true;
     }
 
@@ -66,23 +68,23 @@ public class NettyEventBusClient implements EventBusClient {
      *
      * @param channel  The channel to subscribe to.
      * @param callback The callback to register and have called on message reception.
-     * @return
+     * @return The subscription object created
      */
     @Override
     public Subscription subscribe(final NettyEventBusClient.Channel channel, final Consumer<Message> callback) {
-        LOGGER.info("EventBusClient: subscribe to {}", channel.getAddress());
+        LOGGER.info("EventBusClient: subscribe to '{}'", channel.getAddress());
         NettySubscription s = new NettySubscription(channel, callback);
 
-        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(channel, new ArrayList<>());
+        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(channel.getAddress(), new ArrayList<>());
         subscriptions.add(s);
-        subscriptionsMap.put(channel, subscriptions);
+        subscriptionsMap.put(channel.getAddress(), subscriptions);
 
         return s;
     }
 
-    private void trigger(final NettyEventBusClient.Channel channel, final NettyEventBusClient.Message message) {
-        LOGGER.info("EventBusClient: receive on {}", channel.getAddress());
-        subscriptionsMap.getOrDefault(channel, new ArrayList<>())
+    private void trigger(final NettyEventBusClient.Message message) {
+        LOGGER.info("EventBusClient: on '{}': receive: '{}'", message.getChannel().getAddress(), message.getContent());
+        subscriptionsMap.getOrDefault(message.getChannel().getAddress(), new ArrayList<>())
                 .forEach(c -> c.getCallback().accept(message));
     }
 
@@ -93,10 +95,11 @@ public class NettyEventBusClient implements EventBusClient {
      */
     @Override
     public void revoke(final NettyEventBusClient.Subscription subscription) {
-        LOGGER.info("EventBusClient: unsubscribe from {}", subscription.getChannel().getAddress());
-        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(subscription.getChannel(), new ArrayList<>());
-        subscriptions.remove(subscription.getCallback());
-        subscriptionsMap.put(subscription.getChannel(), subscriptions);
+        LOGGER.info("EventBusClient: unsubscribe from '{}'", subscription.getChannel().getAddress());
+        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(subscription.getChannel().getAddress(), new ArrayList<>());
+        final Channel channel = subscription.getChannel();
+        subscriptions.remove(subscription);
+        subscriptionsMap.put(channel.getAddress(), subscriptions);
     }
 
     /**
@@ -106,16 +109,17 @@ public class NettyEventBusClient implements EventBusClient {
      * @param message The message to publish.
      */
     @Override
-    public void publish(final NettyEventBusClient.Channel channel, final NettyEventBusClient.Message message) {
+    public void publish(final Channel channel, final NettyEventBusClient.Message message) {
         if (nettyChannel == null)
             return;
 
-        ChannelFuture cf = nettyChannel.write(message);
-        nettyChannel.flush();
-        if (!cf.isSuccess()) {
-            System.out.println("Send failed: " + cf.cause());
+        try {
+            final String msg = new ObjectMapper().writeValueAsString(message);
+            nettyChannel.writeAndFlush(msg + "\n");
+            LOGGER.info("EventBusClient: sent message on '{}'", message.getChannel().getAddress());
+        } catch (Exception $e) {
+            LOGGER.error("EventBusClient: Impossible to publish");
         }
-        LOGGER.info("EventBusClient: sent message on {}", channel.getAddress());
     }
 
 }

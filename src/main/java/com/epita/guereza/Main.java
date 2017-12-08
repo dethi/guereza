@@ -4,21 +4,20 @@ import com.epita.guereza.domain.Document;
 import com.epita.guereza.domain.Index;
 import com.epita.guereza.domain.Indexer;
 import com.epita.guereza.domain.RawDocument;
-import com.epita.guereza.eventbus.*;
+import com.epita.guereza.eventbus.NettyChannel;
+import com.epita.guereza.eventbus.NettyEventBusClient;
+import com.epita.guereza.eventbus.NettyMessage;
+import com.epita.guereza.eventbus.ServerInitializer;
 import com.epita.guereza.indexer.IndexerService;
 import com.epita.guereza.winter.Scope;
 import com.epita.guereza.winter.provider.Prototype;
 import com.epita.guereza.winter.provider.Singleton;
-import io.netty.bootstrap.Bootstrap;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -37,38 +36,15 @@ public class Main {
 
         boolean server = false;
         boolean client = true;
-        if (server) {
-            client();
+        if (client) {
+            testEventBusClientSubscribe();
         } else {
             server();
         }
-        //testEventBusClientSubscribe();
+
         //testCrawl(repo);
         //testIndexing(repo, index);
         //testSearch(index, "onions courgettes pepper");
-    }
-
-    private static void client() {
-        EventLoopGroup group = new NioEventLoopGroup();
-        try {
-            Bootstrap bootstrap = new io.netty.bootstrap.Bootstrap()
-                    .group(group)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChatClientInitializer());
-
-            Channel channel = bootstrap.connect(NETTY_HOST, NETTY_PORT).sync().channel();
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Client ready");
-            while (true) {
-                String msg = in.readLine();
-                channel.writeAndFlush(msg + "\r\n");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            group.shutdownGracefully();
-        }
     }
 
     private static void server() {
@@ -99,22 +75,14 @@ public class Main {
         if (succeed) {
             NettyChannel channel = new NettyChannel("room");
             nebc.subscribe(new NettyChannel("room"), message -> {
-                System.out.println(message.getContent());
-                nebc.shutdown();
+                System.out.println("sub: " + message.getContent());
             });
-            NettyMessage msg = new NettyMessage(channel, "text", "Hi!");
-            //nebc.publish(channel, msg);
-        }
-    }
-
-    private static void testEventBusClientPublish() {
-        NettyEventBusClient nebc = new NettyEventBusClient();
-        final boolean succeed = nebc.run(NETTY_HOST, NETTY_PORT);
-        if (succeed) {
-            NettyChannel channel = new NettyChannel("room");
-            NettyMessage msg = new NettyMessage(channel, "text", "Hi!");
-            nebc.publish(channel, msg);
-            nebc.shutdown();
+            try {
+                nebc.publish(channel, new NettyMessage(channel, "Hi!"));
+                nebc.publish(channel, new NettyMessage(new NettyChannel("game"), "Salut mec"));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
     }
 
