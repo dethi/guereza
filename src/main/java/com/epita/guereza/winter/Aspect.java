@@ -4,19 +4,19 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
-public class Aspect implements InvocationHandler {
-    private final Map<Method, List<Consumer<Scope>>> beforeConsumers;
-    private final Map<Method, List<Consumer<Scope>>> afterConsumers;
+public class Aspect<BEAN_TYPE> implements InvocationHandler {
+    private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> beforeConsumers;
+    private final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> afterConsumers;
 
     private final Scope scope;
-    private final Object target;
+    private final BEAN_TYPE target;
 
-    public Aspect(final Map<Method, List<Consumer<Scope>>> beforeConsumers,
-                  final Map<Method, List<Consumer<Scope>>> afterConsumers,
+    public Aspect(final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> beforeConsumers,
+                  final Map<Method, List<BiConsumer<Scope, BEAN_TYPE>>> afterConsumers,
                   final Scope scope,
-                  final Object target) {
+                  final BEAN_TYPE target) {
 
         this.beforeConsumers = beforeConsumers;
         this.afterConsumers = afterConsumers;
@@ -27,16 +27,16 @@ public class Aspect implements InvocationHandler {
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         if (beforeConsumers.containsKey(method)) {
-            for (Consumer<Scope> consumer : beforeConsumers.get(method)) {
-                consumer.accept(scope);
+            for (BiConsumer<Scope, BEAN_TYPE> consumer : beforeConsumers.get(method)) {
+                consumer.accept(scope, target);
             }
         }
 
         Object res = method.invoke(target, args);
 
         if (afterConsumers.containsKey(method)) {
-            for (Consumer<Scope> consumer : afterConsumers.get(method)) {
-                consumer.accept(scope);
+            for (BiConsumer<Scope, BEAN_TYPE> consumer : afterConsumers.get(method)) {
+                consumer.accept(scope, target);
             }
         }
 

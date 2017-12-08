@@ -32,9 +32,10 @@ public class Main {
 
         Method method = getMethod(Repo.class, "nextUrl");
         scope.bean(Repo.class, repo)
-                .before(method, (s) -> System.out.println("before::"))
-                .after(method, (s) -> System.out.println("After1::"))
-                .after(method, (s) -> System.out.println("After2::"));
+                .before(method, (s, obj) -> System.out.println("before::"))
+                .after(method, (s, obj) -> System.out.println("After1::"))
+                .after(method, (s, obj) -> System.out.println("After2::"))
+                .afterCreate((s, obj) -> System.out.println("AfterCreate::"));
 
         Repo r = scope.instanceOf(Repo.class);
         System.out.println(r.nextUrl());

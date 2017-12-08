@@ -14,6 +14,8 @@ public class Prototype<BEAN_TYPE> extends AnyProvider<BEAN_TYPE> {
 
     @Override
     protected BEAN_TYPE createInstance(final Scope scope) {
-        return initiator.apply(scope);
+        BEAN_TYPE target = initiator.apply(scope);
+        callAfterCreate(scope, target);
+        return target;
     }
 }
