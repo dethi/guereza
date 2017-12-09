@@ -23,6 +23,7 @@ public class IndexerService implements Indexer {
 
     @Override
     public Document index(final String text, final String url) {
+        LOGGER.info("Indexing {}", url);
         final String[] tokensArray = Arrays.stream(getSentences(text))
                 .map(this::getWords)
                 .flatMap(Function.identity())
