@@ -24,7 +24,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("usage: ./bin [crawler | indexer | store | server] server_url");
+            System.out.println("usage: ./bin [crawler | indexer | store | server] SERVER_HOST");
             exit(1);
         }
 
