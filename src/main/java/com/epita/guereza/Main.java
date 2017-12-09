@@ -29,7 +29,7 @@ public class Main {
 
         boolean server = false;
         boolean client = true;
-        if (client) {
+        if (server) {
             testEventBusClientSubscribe();
         } else {
             testServer();

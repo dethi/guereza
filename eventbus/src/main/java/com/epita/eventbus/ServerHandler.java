@@ -14,30 +14,30 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
     private static final ChannelGroup channels = new DefaultChannelGroup(new DefaultEventExecutor());
 
     @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
+    public void handlerAdded(final ChannelHandlerContext ctx) {
         final Channel incoming = ctx.channel();
-        LOGGER.info("Server: Handling connection");
+        LOGGER.info("Handling connection");
         channels.add(incoming);
     }
 
     @Override
-    public void handlerRemoved(final ChannelHandlerContext ctx) throws Exception {
+    public void handlerRemoved(final ChannelHandlerContext ctx) {
         final Channel incoming = ctx.channel();
         channels.remove(incoming);
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext channelHandlerContext, final String s) throws Exception {
+    protected void channelRead0(final ChannelHandlerContext channelHandlerContext, final String s) {
         final Channel incoming = channelHandlerContext.channel();
-        LOGGER.info("Server reading: {}", s);
+        LOGGER.info("Reading: {}", s);
         for (final Channel channel : channels) {
-            channel.writeAndFlush(s + "\n");
+            if (incoming != channel)
+                channel.writeAndFlush(s + "\n");
         }
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-            throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
     }

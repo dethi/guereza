@@ -44,11 +44,10 @@ public class NettyEventBusClient implements EventBusClient {
 
             nettyChannel = bootstrap.connect(host, port).sync().channel();
         } catch (Exception e) {
-            LOGGER.error("EventBusClient: impossible to connect to {}:{}", host, port);
-            //e.printStackTrace();
+            LOGGER.error("Impossible to connect to {}:{}", host, port);
             return false;
         }
-        LOGGER.info("EventBusClient: connected on {}:{}", host, port);
+        LOGGER.info("Connected on {}:{}", host, port);
 
         return true;
     }
@@ -69,7 +68,7 @@ public class NettyEventBusClient implements EventBusClient {
      */
     @Override
     public Subscription subscribe(final String channel, final Consumer<Message> callback) {
-        LOGGER.info("EventBusClient: subscribe to '{}'", channel);
+        LOGGER.info("Subscribe to '{}'", channel);
         final EventSubscription s = new EventSubscription(channel, callback);
 
         final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(channel, new ArrayList<>());
@@ -86,7 +85,7 @@ public class NettyEventBusClient implements EventBusClient {
      */
     @Override
     public void revoke(final NettyEventBusClient.Subscription subscription) {
-        LOGGER.info("EventBusClient: unsubscribe from '{}'", subscription.getChannel());
+        LOGGER.info("Unsubscribe from '{}'", subscription.getChannel());
         final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(subscription.getChannel(), new ArrayList<>());
         final String channel = subscription.getChannel();
         subscriptions.remove(subscription);
@@ -107,14 +106,14 @@ public class NettyEventBusClient implements EventBusClient {
         try {
             final String msg = new ObjectMapper().writeValueAsString(message);
             nettyChannel.writeAndFlush(msg + "\r\n");
-            LOGGER.info("EventBusClient: sent message on '{}'", message.getChannel());
-        } catch (Exception $e) {
-            LOGGER.error("EventBusClient: Impossible to publish");
+            LOGGER.info("Sent message on '{}'", message.getChannel());
+        } catch (Exception e) {
+            LOGGER.error("Impossible to publish: {}", e.getMessage());
         }
     }
 
     private void trigger(final NettyEventBusClient.Message message) {
-        LOGGER.info("EventBusClient: on '{}': receive: '{}'", message.getChannel(), message.getContent());
+        LOGGER.info("On '{}': receive: '{}'", message.getChannel(), message.getContent());
         subscriptionsMap.getOrDefault(message.getChannel(), new ArrayList<>())
                 .forEach(c -> c.getCallback().accept(message));
     }

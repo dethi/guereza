@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory;
 public class NettyServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServer.class);
 
-    public NettyServer() {
-
-    }
-
     /**
      * Start the server
      *
@@ -38,8 +34,7 @@ public class NettyServer {
 
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            //e.printStackTrace();
-            LOGGER.error("NettyServer: an error occurred while running");
+            LOGGER.error("NettyServer: an error occurred while running: {}", e.getMessage());
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
