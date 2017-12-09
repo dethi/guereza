@@ -3,6 +3,7 @@ package com.epita.guereza;
 import com.epita.eventbus.EventBusClient;
 import com.epita.eventbus.EventMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,5 +48,14 @@ public abstract class App {
         final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(consumer, seconds, TimeUnit.SECONDS);
         executor.shutdownNow();
+    }
+
+    protected Object mappingObject(EventBusClient.Message message) {
+        try {
+            Class c = ClassLoader.getSystemClassLoader().loadClass(message.getMessageType());
+            return new ObjectMapper().readValue(message.getContent(), c);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

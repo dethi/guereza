@@ -50,8 +50,11 @@ public class IndexerApp extends App {
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
             if (msg != null) {
-                LOGGER.info("Receive url: {}", msg.getContent());
-                indexAndPublish(msg.getContent());
+                String url = (String)mappingObject(msg);
+                if (url != null) {
+                    LOGGER.info("Receive url: {}", url);
+                    indexAndPublish(url);
+                }
 
                 requestNextUrl();
             } else {
