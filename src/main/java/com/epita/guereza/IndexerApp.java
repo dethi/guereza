@@ -3,7 +3,9 @@ package com.epita.guereza;
 import com.epita.domain.Crawler;
 import com.epita.domain.Document;
 import com.epita.domain.Indexer;
+import com.epita.domain.RawDocument;
 import com.epita.eventbus.EventBusClient;
+import com.epita.guereza.service.CrawlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +21,19 @@ public class IndexerApp extends App {
         this.crawler = crawler;
     }
 
-    private void publishDocument(final Document doc) {
+    private void indexAndPublish(final String url) {
+        final CrawlerService c = new CrawlerService();
+        final RawDocument d = c.crawl(url);
+        if (d == null)
+            return;
+
+        final String text = c.extractText(d);
+        final Document doc = indexer.index(text, url);
         if (doc != null) {
             // FIXME: publish
 
             //indexer.publish(index, doc);
+            sendMessage("/store/indexer", doc);
         }
     }
 
@@ -36,7 +46,7 @@ public class IndexerApp extends App {
         eventBus.subscribe("/request/index/url/" + uid, msg -> {
             final String url = msg.getContent();
             LOGGER.info("Receive url: {}", url);
-            publishDocument(indexer.index(url));
+            indexAndPublish(url);
 
             requestNextUrl();
         });

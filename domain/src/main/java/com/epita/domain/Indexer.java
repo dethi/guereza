@@ -11,15 +11,7 @@ public interface Indexer {
      * @param url The url to index
      * @return The result document
      */
-     Document index(final String url);
-
-    /**
-     * Add a document to the index
-     *
-     * @param index The index
-     * @param doc   The doc to store
-     */
-    void publish(final Index index, final Document doc);
+     Document index(final String text, final String url);
 
     /**
      * Search a query in a list of document

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class IndexerService implements Indexer {
-    private static final Logger logger = LoggerFactory.getLogger(CrawlerService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerService.class);
     private static final String REGEX_PUNCTUATION = "[.!?]";
     private static final String REGEX_SPACE = "\\s+";
     private static final String REGEX_ALPHANUM = "[^-\\dA-Za-z ]";
@@ -22,14 +22,7 @@ public class IndexerService implements Indexer {
 
 
     @Override
-    public Document index(final String url) {
-        logger.info("indexing {}", url);
-        final CrawlerService c = new CrawlerService();
-        final RawDocument d = c.crawl(url);
-        if (d == null)
-            return null;
-        final String text = c.extractText(d);
-
+    public Document index(final String text, final String url) {
         final String[] tokensArray = Arrays.stream(getSentences(text))
                 .map(this::getWords)
                 .flatMap(Function.identity())
@@ -54,10 +47,12 @@ public class IndexerService implements Indexer {
         return new Document(url, terms);
     }
 
+    /*
     @Override
     public void publish(final Index i, final Document d) {
         i.docs.add(d);
     }
+    */
 
     @Override
     public Map<Document, Double> search(final List<Document> docs, final String query) {
