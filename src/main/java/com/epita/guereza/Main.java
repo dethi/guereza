@@ -75,12 +75,22 @@ public class Main {
 
     private static void runStore(Scope scope) {
         final Function<Scope, UrlStore> newUrlStore = (s) -> new UrlStore(s.instanceOf(EventBusClient.class));
+        final Function<Scope, RetroIndex> newRetroIndex = (s) -> new RetroIndex();
         final Function<Scope, App> newEventStoreApp = (s) -> new EventStoreApp(
                 s.instanceOf(EventBusClient.class), s.instanceOf(EventStore.class));
 
         scope.scope()
                 .register(new Singleton<>(EventStore.class, new EventStore()))
-                .register(new LazySingleton<>(UrlStore.class, newUrlStore))
+                .register(new LazySingleton<>(UrlStore.class, newUrlStore)
+                        .afterCreate((s, obj) -> {
+                            EventStore eventStore = s.instanceOf(EventStore.class);
+                            eventStore.addReducer(obj);
+                        }))
+                .register(new LazySingleton<>(RetroIndex.class, newRetroIndex)
+                        .afterCreate((s, obj) -> {
+                            EventStore eventStore = s.instanceOf(EventStore.class);
+                            eventStore.addReducer(obj);
+                        }))
                 .register(new Prototype<>(App.class, newEventStoreApp))
                 .block(Main::runApp);
     }
