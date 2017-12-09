@@ -14,14 +14,14 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final String msg) {
-        System.err.println(msg);
-    }
-
-    @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         final EventMessage res = new ObjectMapper().readValue(msg.toString(), EventMessage.class);
         consumer.accept(res);
+    }
+
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final String msg) {
+        System.err.println(msg);
     }
 
     @Override
