@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class UrlStore implements Reducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerService.class);
-    private static final String STARTING_URL = "https://www.wikipedia.org";
+    private static final String STARTING_URL = "http://www.wikipedia.org";
 
     private final EventBusClient eventBus;
 
