@@ -31,7 +31,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
         Channel incoming = channelHandlerContext.channel();
         LOGGER.info("Server reading: {}", s);
         for (Channel channel : channels) {
-            channel.writeAndFlush(s);
+            channel.writeAndFlush(s + "\n");
         }
     }
 

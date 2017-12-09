@@ -3,13 +3,13 @@ package com.epita.guereza.eventbus;
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
-public class NettySubscription implements EventBusClient.Subscription {
+public class EventSubscription implements EventBusClient.Subscription {
     private final EventBusClient.Channel channel;
     private final Consumer<EventBusClient.Message> callback;
     private final LocalDateTime subscriptionDateTime;
     private long messageReceivedCount;
 
-    public NettySubscription(EventBusClient.Channel channel, Consumer<EventBusClient.Message> callback) {
+    public EventSubscription(EventBusClient.Channel channel, Consumer<EventBusClient.Message> callback) {
         this.channel = channel;
         this.callback = callback;
         this.subscriptionDateTime = LocalDateTime.now();

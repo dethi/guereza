@@ -1,12 +1,12 @@
 package com.epita.guereza.eventbus;
 
-public class NettyChannel implements EventBusClient.Channel {
+public class EventChannel implements EventBusClient.Channel {
 
     private String address;
 
-    public NettyChannel() { }
+    public EventChannel() { }
 
-    public NettyChannel(String address) {
+    public EventChannel(String address) {
         this.address = address;
     }
 

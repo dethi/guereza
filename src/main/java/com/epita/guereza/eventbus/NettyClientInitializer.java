@@ -11,14 +11,14 @@ import io.netty.handler.codec.string.StringEncoder;
 import java.util.function.Consumer;
 
 public class NettyClientInitializer extends ChannelInitializer<SocketChannel> {
-    private final Consumer<NettyMessage> consumer;
-    public NettyClientInitializer(Consumer<NettyMessage> c) {
+    private final Consumer<EventMessage> consumer;
+    public NettyClientInitializer(Consumer<EventMessage> c) {
         this.consumer = c;
     }
 
     @Override
     public void initChannel(SocketChannel ch) {
-        ChannelPipeline pipeline = ch.pipeline();
+        final ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
         pipeline.addLast( new StringDecoder());

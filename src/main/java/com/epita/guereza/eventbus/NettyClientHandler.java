@@ -7,9 +7,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import java.util.function.Consumer;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
-    private final Consumer<NettyMessage> consumer;
+    private final Consumer<EventMessage> consumer;
 
-    public NettyClientHandler(Consumer<NettyMessage> c) {
+    public NettyClientHandler(Consumer<EventMessage> c) {
         this.consumer = c;
     }
 
@@ -20,7 +20,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        NettyMessage res = new ObjectMapper().readValue(msg.toString(), NettyMessage.class);
+        EventMessage res = new ObjectMapper().readValue(msg.toString(), EventMessage.class);
         consumer.accept(res);
     }
 

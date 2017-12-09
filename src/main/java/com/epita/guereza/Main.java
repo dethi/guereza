@@ -4,19 +4,12 @@ import com.epita.guereza.domain.Document;
 import com.epita.guereza.domain.Index;
 import com.epita.guereza.domain.Indexer;
 import com.epita.guereza.domain.RawDocument;
-import com.epita.guereza.eventbus.NettyChannel;
-import com.epita.guereza.eventbus.NettyEventBusClient;
-import com.epita.guereza.eventbus.NettyMessage;
-import com.epita.guereza.eventbus.ServerInitializer;
+import com.epita.guereza.eventbus.*;
 import com.epita.guereza.indexer.IndexerService;
 import com.epita.guereza.winter.Scope;
 import com.epita.guereza.winter.provider.Prototype;
 import com.epita.guereza.winter.provider.Singleton;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -39,7 +32,7 @@ public class Main {
         if (client) {
             testEventBusClientSubscribe();
         } else {
-            server();
+            testServer();
         }
 
         //testCrawl(repo);
@@ -47,39 +40,24 @@ public class Main {
         //testSearch(index, "onions courgettes pepper");
     }
 
-    private static void server() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap()
-                    .group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ServerInitializer());
-
-            bootstrap.bind(NETTY_PORT).sync().channel().closeFuture().sync();
-            System.out.println("Server ready.");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+    private static void testServer() {
+        final NettyServer ns = new NettyServer();
+        ns.run(NETTY_PORT);
     }
 
 
     private static void testEventBusClientSubscribe() {
-        NettyEventBusClient nebc = new NettyEventBusClient();
+        final NettyEventBusClient nebc = new NettyEventBusClient();
         final boolean succeed = nebc.run(NETTY_HOST, NETTY_PORT);
 
         if (succeed) {
-            NettyChannel channel = new NettyChannel("room");
-            nebc.subscribe(new NettyChannel("room"), message -> {
+            final EventChannel channel = new EventChannel("room");
+            final EventBusClient.Subscription s = nebc.subscribe(new EventChannel("room"), message -> {
                 System.out.println("sub: " + message.getContent());
             });
             try {
-                nebc.publish(channel, new NettyMessage(channel, "Hi!"));
-                nebc.publish(channel, new NettyMessage(new NettyChannel("game"), "Salut mec"));
+                nebc.publish(channel, new EventMessage(channel, "Hi!"));
+                nebc.publish(channel, new EventMessage(new EventChannel("game"), "Salut mec"));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }

@@ -37,15 +37,12 @@ public class NettyEventBusClient implements EventBusClient {
 
         group = new NioEventLoopGroup();
         try {
-            Bootstrap bootstrap = new io.netty.bootstrap.Bootstrap()
+            final Bootstrap bootstrap = new io.netty.bootstrap.Bootstrap()
                     .group(group)
                     .channel(NioSocketChannel.class)
                     .handler(new NettyClientInitializer(this::trigger));
 
             nettyChannel = bootstrap.connect(host, port).sync().channel();
-
-
-            System.out.println("Client ready");
         } catch (Exception e) {
             LOGGER.error("EventBusClient: impossible to connect to {}:{}", host, port);
             //e.printStackTrace();
@@ -73,7 +70,7 @@ public class NettyEventBusClient implements EventBusClient {
     @Override
     public Subscription subscribe(final NettyEventBusClient.Channel channel, final Consumer<Message> callback) {
         LOGGER.info("EventBusClient: subscribe to '{}'", channel.getAddress());
-        NettySubscription s = new NettySubscription(channel, callback);
+        final EventSubscription s = new EventSubscription(channel, callback);
 
         final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(channel.getAddress(), new ArrayList<>());
         subscriptions.add(s);
@@ -115,7 +112,7 @@ public class NettyEventBusClient implements EventBusClient {
 
         try {
             final String msg = new ObjectMapper().writeValueAsString(message);
-            nettyChannel.writeAndFlush(msg + "\n");
+            nettyChannel.writeAndFlush(msg + "\r\n");
             LOGGER.info("EventBusClient: sent message on '{}'", message.getChannel().getAddress());
         } catch (Exception $e) {
             LOGGER.error("EventBusClient: Impossible to publish");

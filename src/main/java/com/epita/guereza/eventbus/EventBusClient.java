@@ -39,7 +39,7 @@ public interface EventBusClient {
     /**
      * Interface for channels.
      */
-    @JsonDeserialize(as = NettyChannel.class)
+    @JsonDeserialize(as = EventChannel.class)
     interface Channel {
         /**
          * Get the address of the given channel.
