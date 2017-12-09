@@ -37,8 +37,6 @@ public class Main {
 //            testServer();
 //        }
 //
-//        //testCrawl(repo);
-//        //testIndexing(repo, index);
 //        //testSearch(index, "onions courgettes pepper");
 
         testApp();
@@ -51,7 +49,7 @@ public class Main {
 
         final Function<Scope, EventBusClient> newEventBus = (s) -> new NettyEventBusClient();
         final Function<Scope, CrawlerApp> newCrawlerApp = (s) -> new CrawlerApp(s.instanceOf(Crawler.class),
-                s.instanceOf(Repo.class), s.instanceOf(EventBusClient.class));
+                s.instanceOf(EventBusClient.class));
         final Function<Scope, IndexerApp> newIndexerApp = (s) -> new IndexerApp(s.instanceOf(Indexer.class),
                 s.instanceOf(Crawler.class), s.instanceOf(EventBusClient.class));
 
@@ -62,9 +60,12 @@ public class Main {
                 .register(new Prototype<>(EventBusClient.class, newEventBus))
                 .register(new Prototype<>(CrawlerApp.class, newCrawlerApp))
                 .register(new Prototype<>(IndexerApp.class, newIndexerApp))
-                .block((scope) -> {
-                    // MAIN CALL HERE
-                });
+                .block(Main::runApp);
+    }
+
+    private static void runApp(Scope scope) {
+        CrawlerApp crawlerApp = scope.instanceOf(CrawlerApp.class);
+        crawlerApp.run();
     }
 
     private static void testServer() {
@@ -82,8 +83,8 @@ public class Main {
                 System.out.println("sub: " + message.getContent());
             });
             try {
-                nebc.publish("room", new EventMessage("room", "Hi!"));
-                nebc.publish("game", new EventMessage("game", "Salut mec"));
+                nebc.publish(new EventMessage("room", "Hi!"));
+                nebc.publish(new EventMessage("game", "Salut mec"));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -121,38 +122,6 @@ public class Main {
                 });
     }
 
-    private static void testCrawl(final Repo repo) {
-        CrawlerService crawler = new CrawlerService();
-
-        int limit = 20;
-        while (limit-- > 0) {
-            final String url = repo.nextUrl();
-            if (url == null)
-                break;
-
-            final RawDocument doc = crawler.crawl(url);
-            if (doc == null)
-                continue;
-
-            final String[] urls = crawler.extractUrl(doc);
-            repo.store(urls);
-        }
-    }
-
-    private static void testIndexing(final Repo repo, final Index index) {
-        IndexerService indexer = new IndexerService();
-
-        String url = repo.nextUrl();
-        int limit = 300;
-        while (url != null && limit-- > 0) {
-            final Document d = indexer.index(url);
-            url = repo.nextUrl();
-
-            if (d == null)
-                continue;
-            indexer.publish(index, d);
-        }
-    }
 
     private static void testSearch(final Index index, final String query) {
         IndexerService indexer = new IndexerService();

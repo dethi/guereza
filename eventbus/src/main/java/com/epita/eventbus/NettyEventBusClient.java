@@ -95,11 +95,10 @@ public class NettyEventBusClient implements EventBusClient {
     /**
      * Publish a new message through netty in a channel
      *
-     * @param channel The channel to publish to.
      * @param message The message to publish.
      */
     @Override
-    public void publish(final String channel, final NettyEventBusClient.Message message) {
+    public void publish(final NettyEventBusClient.Message message) {
         if (nettyChannel == null)
             return;
 

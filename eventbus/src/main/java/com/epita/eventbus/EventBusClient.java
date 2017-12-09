@@ -30,10 +30,9 @@ public interface EventBusClient {
     /**
      * Publish the given message on the given channel.
      *
-     * @param channel The channel to publish to.
      * @param message The message to publish.
      */
-    void publish(final String channel, final Message message);
+    void publish(final Message message);
 
 
     /**

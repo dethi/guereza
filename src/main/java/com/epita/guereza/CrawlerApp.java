@@ -1,22 +1,47 @@
 package com.epita.guereza;
 
 import com.epita.domain.Crawler;
+import com.epita.domain.RawDocument;
 import com.epita.eventbus.EventBusClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
+public class CrawlerApp extends App {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerApp.class);
+    private final Crawler crawler;
 
-public class CrawlerApp {
-    public final String uid;
-
-    public final Crawler crawler;
-    public final Repo repo;
-    public final EventBusClient eventBus;
-
-    public CrawlerApp(final Crawler crawler, final Repo repo, final EventBusClient eventBus) {
-        this.uid = UUID.randomUUID().toString();
-
+    public CrawlerApp(final Crawler crawler, final EventBusClient eventBus) {
+        super(eventBus);
         this.crawler = crawler;
-        this.repo = repo;
-        this.eventBus = eventBus;
+    }
+
+    private String[] crawlAndExtract(final String url) {
+        final RawDocument doc = crawler.crawl(url);
+        if (doc == null)
+            return null;
+
+        return crawler.extractUrl(doc);
+    }
+
+    private void requestNextUrl() {
+        sendMessage("/request/crawler/url", uid);
+    }
+
+    private void storeUrls(final String[] urls) {
+        sendMessage("/store/crawler", urls);
+    }
+
+
+    @Override
+    public void run() {
+        eventBus.subscribe("/request/crawl/url/" + uid, c -> {
+            System.out.println(c.getContent());
+            final String[] urls = crawlAndExtract(c.getContent());
+            storeUrls(urls);
+
+            requestNextUrl();
+        });
+
+        requestNextUrl();
     }
 }
