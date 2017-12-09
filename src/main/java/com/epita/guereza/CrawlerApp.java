@@ -3,6 +3,7 @@ package com.epita.guereza;
 import com.epita.domain.Crawler;
 import com.epita.domain.RawDocument;
 import com.epita.eventbus.EventBusClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +41,16 @@ public class CrawlerApp extends App {
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
             if (msg != null) {
-                LOGGER.info("Receive url: {}", msg.getContent());
-                final String[] urls = crawlAndExtract(msg.getContent());
-                storeUrls(urls);
+                try {
+                    Class c = ClassLoader.getSystemClassLoader().loadClass(msg.getMessageType());
+                    String url = (String)new ObjectMapper().readValue(msg.getContent(), c);
+                    LOGGER.info("Receive url: {}", url);
+                    final String[] urls = crawlAndExtract(url);
+                    storeUrls(urls);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
 
                 requestNextUrl();
             } else {
