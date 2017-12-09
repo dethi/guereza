@@ -35,19 +35,19 @@ public class EventStoreApp extends App {
     @Override
     public void run() {
         eventBus.subscribe("/request/crawler/url", msg -> extractThen(msg, o -> {
-            Event<String> ev = new Event<>("CRAWLER_REQUEST_URL", String.class, (String) o);
+            Event<String> ev = new Event<>("CRAWLER_REQUEST_URL", (String) o);
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/request/indexer/url", msg -> extractThen(msg, o -> {
-            Event<String> ev = new Event<>("INDEXER_REQUEST_URL", String.class, (String) o);
+            Event<String> ev = new Event<>("INDEXER_REQUEST_URL", (String) o);
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/store/crawler", msg -> extractThen(msg, o -> {
-            Event<String[]> ev = new Event<>("ADD_URLS", String[].class, (String[]) o);
+            Event<String[]> ev = new Event<>("ADD_URLS", (String[]) o);
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/store/indexer", msg -> extractThen(msg, o -> {
-            Event<Document> ev = new Event<>("ADD_DOCUMENT", Document.class, (Document) o);
+            Event<Document> ev = new Event<>("ADD_DOCUMENT", (Document) o);
             eventStore.dispatch(ev);
         }));
     }
