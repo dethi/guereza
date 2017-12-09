@@ -1,5 +1,6 @@
-package com.epita.eventbus;
+package com.epita.eventbus.client;
 
+import com.epita.eventbus.EventMessage;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -21,7 +22,7 @@ public class NettyClientInitializer extends ChannelInitializer<SocketChannel> {
     public void initChannel(SocketChannel ch) {
         final ChannelPipeline pipeline = ch.pipeline();
 
-        pipeline.addLast(new DelimiterBasedFrameDecoder(1048576*2, Delimiters.lineDelimiter()));
+        pipeline.addLast(new DelimiterBasedFrameDecoder(1048576 * 2, Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder());
         pipeline.addLast(new StringEncoder());
 

@@ -1,4 +1,4 @@
-package com.epita.eventbus;
+package com.epita.eventbus.client;
 
 import java.time.LocalDateTime;
 import java.util.function.Consumer;

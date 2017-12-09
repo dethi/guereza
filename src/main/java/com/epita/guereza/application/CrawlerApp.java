@@ -1,11 +1,12 @@
-package com.epita.guereza;
+package com.epita.guereza.application;
 
 import com.epita.domain.Crawler;
 import com.epita.domain.RawDocument;
-import com.epita.eventbus.EventBusClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.epita.eventbus.client.EventBusClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 public class CrawlerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerApp.class);
@@ -34,7 +35,7 @@ public class CrawlerApp extends App {
     private void storeUrls(final String[] urls) {
         if (urls != null) {
             LOGGER.info("Store {} urls", urls.length);
-            sendMessage("/store/crawler", new WrapperStringArray(urls));
+            sendMessage("/store/crawler", Arrays.asList(urls));
         }
     }
 
@@ -43,7 +44,7 @@ public class CrawlerApp extends App {
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
             if (msg != null) {
-                String url = (String)mappingObject(msg);
+                String url = (String) mappingObject(msg);
                 if (url != null) {
                     LOGGER.info("Receive url: {}", url);
                     final String[] urls = crawlAndExtract(url);

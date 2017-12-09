@@ -1,4 +1,4 @@
-package com.epita.guereza.eventsourcing;
+package com.epita.eventsourcing;
 
 @SuppressWarnings("WeakerAccess")
 public class Event<BEAN_TYPE> {

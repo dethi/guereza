@@ -1,4 +1,4 @@
-package com.epita.guereza.eventsourcing;
+package com.epita.eventsourcing;
 
 import java.util.ArrayList;
 import java.util.List;

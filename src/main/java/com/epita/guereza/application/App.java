@@ -1,7 +1,7 @@
-package com.epita.guereza;
+package com.epita.guereza.application;
 
-import com.epita.eventbus.EventBusClient;
 import com.epita.eventbus.EventMessage;
+import com.epita.eventbus.client.EventBusClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

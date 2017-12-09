@@ -1,17 +1,12 @@
-package com.epita.guereza;
+package com.epita.guereza.application;
 
 import com.epita.domain.Crawler;
 import com.epita.domain.Document;
 import com.epita.domain.Indexer;
 import com.epita.domain.RawDocument;
-import com.epita.eventbus.EventBusClient;
+import com.epita.eventbus.client.EventBusClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class IndexerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexerApp.class);
@@ -50,7 +45,7 @@ public class IndexerApp extends App {
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
             if (msg != null) {
-                String url = (String)mappingObject(msg);
+                String url = (String) mappingObject(msg);
                 if (url != null) {
                     LOGGER.info("Receive url: {}", url);
                     indexAndPublish(url);

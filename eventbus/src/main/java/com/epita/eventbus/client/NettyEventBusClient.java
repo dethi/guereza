@@ -1,5 +1,6 @@
-package com.epita.eventbus;
+package com.epita.eventbus.client;
 
+import com.epita.eventbus.EventSubscription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
@@ -17,10 +18,10 @@ import java.util.function.Consumer;
 public class NettyEventBusClient implements EventBusClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyEventBusClient.class);
     private final Map<String, List<Subscription>> subscriptionsMap;
-    private io.netty.channel.Channel nettyChannel;
-    private EventLoopGroup group;
     private final String host;
     private final int port;
+    private io.netty.channel.Channel nettyChannel;
+    private EventLoopGroup group;
 
     public NettyEventBusClient(final String host, final int port) {
         subscriptionsMap = new HashMap<>();
@@ -50,13 +51,6 @@ public class NettyEventBusClient implements EventBusClient {
         LOGGER.info("Connected on {}:{}", host, port);
 
         return true;
-    }
-
-    /**
-     * Close the EventBus
-     */
-    public void shutdown() {
-        group.shutdownGracefully();
     }
 
     /**
@@ -109,6 +103,13 @@ public class NettyEventBusClient implements EventBusClient {
         } catch (Exception e) {
             LOGGER.error("Impossible to publish: {}", e.getMessage());
         }
+    }
+
+    /**
+     * Close the EventBus
+     */
+    public void shutdown() {
+        group.shutdownGracefully();
     }
 
     private void trigger(final NettyEventBusClient.Message message) {

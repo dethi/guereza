@@ -1,20 +1,20 @@
 package com.epita.guereza;
 
 import com.epita.domain.Crawler;
-import com.epita.domain.Document;
-import com.epita.domain.Index;
 import com.epita.domain.Indexer;
-import com.epita.eventbus.EventBusClient;
-import com.epita.eventbus.NettyEventBusClient;
-import com.epita.guereza.eventsourcing.EventStore;
-import com.epita.guereza.service.CrawlerService;
-import com.epita.guereza.service.indexer.IndexerService;
+import com.epita.domain.SimpleCrawler;
+import com.epita.domain.SimpleIndexer;
+import com.epita.eventbus.client.EventBusClient;
+import com.epita.eventbus.client.NettyEventBusClient;
+import com.epita.eventsourcing.EventStore;
+import com.epita.guereza.application.*;
+import com.epita.guereza.reducer.RetroIndex;
+import com.epita.guereza.reducer.UrlStore;
 import com.epita.winter.Scope;
 import com.epita.winter.provider.LazySingleton;
 import com.epita.winter.provider.Prototype;
 import com.epita.winter.provider.Singleton;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import static java.lang.System.exit;
@@ -49,8 +49,8 @@ public class Main {
 
     private static Scope createScope(final String host, final int port) {
         return new Scope()
-                .register(new Singleton<>(Crawler.class, new CrawlerService()))
-                .register(new Singleton<>(Indexer.class, new IndexerService()))
+                .register(new Singleton<>(Crawler.class, new SimpleCrawler()))
+                .register(new Singleton<>(Indexer.class, new SimpleIndexer()))
                 .register(new Singleton<>(EventBusClient.class, new NettyEventBusClient(host, port)));
     }
 
@@ -98,16 +98,5 @@ public class Main {
 
     private static void runServer() {
         new ServerApp(NETTY_PORT).run();
-    }
-
-    private static void testSearch(final Index index, final String query) {
-        IndexerService indexer = new IndexerService();
-
-        System.out.printf("Results for '%s'\n", query);
-
-        final Map<Document, Double> res = indexer.search(index.docs, query);
-        for (final Map.Entry<Document, Double> doc : res.entrySet()) {
-            System.out.printf("%100s %f\n", doc.getKey().url, doc.getValue());
-        }
     }
 }

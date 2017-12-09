@@ -1,4 +1,4 @@
-package com.epita.eventbus;
+package com.epita.eventbus.server;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

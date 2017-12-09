@@ -1,9 +1,5 @@
-package com.epita.guereza.service.indexer;
+package com.epita.domain;
 
-import com.epita.domain.Document;
-import com.epita.domain.Indexer;
-import com.epita.domain.Term;
-import com.epita.guereza.service.CrawlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +9,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class IndexerService implements Indexer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerService.class);
+public class SimpleIndexer implements Indexer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCrawler.class);
     private static final String REGEX_PUNCTUATION = "[.!?]";
     private static final String REGEX_SPACE = "\\s+";
     private static final String REGEX_ALPHANUM = "[^-\\dA-Za-z ]";
@@ -49,13 +45,6 @@ public class IndexerService implements Indexer {
         }
         return new Document(url, terms);
     }
-
-    /*
-    @Override
-    public void publish(final Index i, final Document d) {
-        i.docs.add(d);
-    }
-    */
 
     @Override
     public Map<Document, Double> search(final List<Document> docs, final String query) {

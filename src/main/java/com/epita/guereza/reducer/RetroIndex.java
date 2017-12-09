@@ -1,9 +1,9 @@
-package com.epita.guereza;
+package com.epita.guereza.reducer;
 
 import com.epita.domain.Document;
 import com.epita.domain.Index;
-import com.epita.guereza.eventsourcing.Event;
-import com.epita.guereza.eventsourcing.Reducer;
+import com.epita.eventsourcing.Event;
+import com.epita.eventsourcing.Reducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

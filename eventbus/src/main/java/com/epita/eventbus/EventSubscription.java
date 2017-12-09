@@ -1,5 +1,7 @@
 package com.epita.eventbus;
 
+import com.epita.eventbus.client.EventBusClient;
+
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 

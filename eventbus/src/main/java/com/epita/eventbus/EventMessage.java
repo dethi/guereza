@@ -1,5 +1,6 @@
 package com.epita.eventbus;
 
+import com.epita.eventbus.client.EventBusClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

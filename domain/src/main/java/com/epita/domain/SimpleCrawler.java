@@ -1,7 +1,5 @@
-package com.epita.guereza.service;
+package com.epita.domain;
 
-import com.epita.domain.Crawler;
-import com.epita.domain.RawDocument;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -9,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class CrawlerService implements Crawler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerService.class);
+public class SimpleCrawler implements Crawler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCrawler.class);
 
     @Override
     public RawDocument crawl(final String url) {

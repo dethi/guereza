@@ -1,20 +1,21 @@
-package com.epita.guereza;
+package com.epita.guereza.application;
 
 import com.epita.domain.Document;
-import com.epita.eventbus.EventBusClient;
-import com.epita.guereza.eventsourcing.Event;
-import com.epita.guereza.eventsourcing.EventStore;
+import com.epita.eventbus.client.EventBusClient;
+import com.epita.eventsourcing.Event;
+import com.epita.eventsourcing.EventStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class EventStoreApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStore.class);
     private final EventStore eventStore;
 
-    protected EventStoreApp(EventBusClient eventBus, EventStore eventStore) {
+    public EventStoreApp(EventBusClient eventBus, EventStore eventStore) {
         super(eventBus);
 
         this.eventStore = eventStore;
@@ -33,6 +34,7 @@ public class EventStoreApp extends App {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void run() {
         eventBus.subscribe("/request/crawler/url", msg -> extractThen(msg, o -> {
@@ -44,7 +46,7 @@ public class EventStoreApp extends App {
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/store/crawler", msg -> extractThen(msg, o -> {
-            Event<WrapperStringArray> ev = new Event<>("ADD_URLS", (WrapperStringArray) o);
+            Event<List<String>> ev = new Event<>("ADD_URLS", (List<String>) o);
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/store/indexer", msg -> extractThen(msg, o -> {

@@ -1,4 +1,4 @@
-package com.epita.eventbus;
+package com.epita.eventbus.server;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -14,7 +14,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel socketChannel) {
         final ChannelPipeline pipeline = socketChannel.pipeline();
 
-        pipeline.addLast(new DelimiterBasedFrameDecoder(1048576*2, Delimiters.lineDelimiter()));
+        pipeline.addLast(new DelimiterBasedFrameDecoder(1048576 * 2, Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder());
         pipeline.addLast(new StringEncoder());
 

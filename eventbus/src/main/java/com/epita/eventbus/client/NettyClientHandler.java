@@ -1,5 +1,6 @@
-package com.epita.eventbus;
+package com.epita.eventbus.client;
 
+import com.epita.eventbus.EventMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
