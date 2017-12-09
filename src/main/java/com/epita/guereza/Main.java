@@ -20,6 +20,7 @@ import java.util.function.Function;
 import static java.lang.System.exit;
 
 public class Main {
+    private static final String NETTY_HOST = "localhost";
     private static final int NETTY_PORT = 8000;
 
     public static void main(String[] args) {
@@ -95,8 +96,10 @@ public class Main {
     }
 
     private static void runApp(Scope scope) {
-        App app = scope.instanceOf(App.class);
-        app.run();
+        boolean ok = scope.instanceOf(EventBusClient.class).start(NETTY_HOST, NETTY_PORT);
+        if (ok) {
+            scope.instanceOf(App.class).run();
+        }
     }
 
     private static void runServer() {
