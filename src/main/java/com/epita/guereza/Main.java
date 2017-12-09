@@ -8,15 +8,13 @@ import com.epita.eventbus.NettyServer;
 import com.epita.guereza.service.CrawlerService;
 import com.epita.guereza.service.indexer.IndexerService;
 import com.epita.winter.Scope;
+import com.epita.winter.provider.LazySingleton;
 import com.epita.winter.provider.Prototype;
 import com.epita.winter.provider.Singleton;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
-
-import static com.epita.winter.Scope.getMethod;
 
 public class Main {
     private static final String NETTY_HOST = "localhost";
@@ -24,7 +22,7 @@ public class Main {
 
     public static void main(String[] args) {
 //        final Index index = new Index();
-//        final Repo repo = new RepoStore();
+//        final Repo repo = new UrlStore();
 //
 //        //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
 //
@@ -44,17 +42,17 @@ public class Main {
     private static void testApp() {
         final Crawler crawler = new CrawlerService();
         final Indexer indexer = new IndexerService();
-        final Repo repo = new RepoStore();
 
         final Function<Scope, EventBusClient> newEventBus = (s) -> new NettyEventBusClient();
         final Function<Scope, CrawlerApp> newCrawlerApp = (s) -> new CrawlerApp(s.instanceOf(EventBusClient.class), s.instanceOf(Crawler.class));
         final Function<Scope, IndexerApp> newIndexerApp = (s) -> new IndexerApp(s.instanceOf(EventBusClient.class), s.instanceOf(Indexer.class),
                 s.instanceOf(Crawler.class));
+        final Function<Scope, Repo> newRepo = (s) -> new UrlStore(s.instanceOf(EventBusClient.class));
 
         new Scope()
                 .register(new Singleton<>(Crawler.class, crawler))
                 .register(new Singleton<>(Indexer.class, indexer))
-                .register(new Singleton<>(Repo.class, repo))
+                .register(new LazySingleton<>(Repo.class, newRepo))
                 .register(new Prototype<>(EventBusClient.class, newEventBus))
                 .register(new Prototype<>(CrawlerApp.class, newCrawlerApp))
                 .register(new Prototype<>(IndexerApp.class, newIndexerApp))
