@@ -45,11 +45,6 @@ public class Main {
         crawlerApp.run();
     }
 
-    private static void testServer() {
-        final NettyServer ns = new NettyServer();
-        ns.run(NETTY_PORT);
-    }
-
     private static void testSearch(final Index index, final String query) {
         IndexerService indexer = new IndexerService();
 
