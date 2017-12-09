@@ -9,10 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class UrlStore implements Reducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerService.class);
@@ -26,7 +23,9 @@ public class UrlStore implements Reducer {
 
     public UrlStore(final EventBusClient eventBus) {
         this.eventBus = eventBus;
-        store(new String[] {STARTING_URL});
+        final List<String> initialList = new ArrayList<String>();
+        initialList.add(STARTING_URL);
+        store(initialList);
     }
 
     @SuppressWarnings("unchecked")
@@ -34,7 +33,7 @@ public class UrlStore implements Reducer {
     public void reduce(final Event<?> event) {
         switch (event.type) {
             case "ADD_URLS":
-                addUrls((Event<String[]>) event);
+                addUrls((Event<WrapperStringArray>) event);
                 break;
             case "CRAWLER_REQUEST_URL":
                 crawlerRequestUrl((Event<String>) event);
@@ -45,7 +44,7 @@ public class UrlStore implements Reducer {
         }
     }
 
-    private void store(String[] urls) {
+    private void store(List<String> urls) {
         for (String url : urls) {
             if (url == null || url.isEmpty())
                 continue;
@@ -58,8 +57,8 @@ public class UrlStore implements Reducer {
         }
     }
 
-    private void addUrls(Event<String[]> event) {
-        store(event.obj);
+    private void addUrls(Event<WrapperStringArray> event) {
+        store(event.obj.content);
         LOGGER.info("added URLs to the repo");
     }
 

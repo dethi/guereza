@@ -22,6 +22,7 @@ public class EventStoreApp extends App {
 
     private void extractThen(final EventBusClient.Message msg, final Consumer<Object> consumer) {
         try {
+            LOGGER.info("Message Type: {}", msg.getMessageType());
             Class c = ClassLoader.getSystemClassLoader().loadClass(msg.getMessageType());
             Object o = new ObjectMapper().readValue(msg.getContent(), c);
             if (o != null) {
@@ -43,7 +44,7 @@ public class EventStoreApp extends App {
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/store/crawler", msg -> extractThen(msg, o -> {
-            Event<String[]> ev = new Event<>("ADD_URLS", (String[]) o);
+            Event<WrapperStringArray> ev = new Event<>("ADD_URLS", (WrapperStringArray) o);
             eventStore.dispatch(ev);
         }));
         eventBus.subscribe("/store/indexer", msg -> extractThen(msg, o -> {

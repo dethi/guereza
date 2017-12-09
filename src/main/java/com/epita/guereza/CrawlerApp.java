@@ -32,8 +32,10 @@ public class CrawlerApp extends App {
     }
 
     private void storeUrls(final String[] urls) {
-        LOGGER.info("Store {} urls", urls.length);
-        sendMessage("/store/crawler", urls);
+        if (urls != null) {
+            LOGGER.info("Store {} urls", urls.length);
+            sendMessage("/store/crawler", new WrapperStringArray(urls));
+        }
     }
 
 
