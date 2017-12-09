@@ -3,13 +3,13 @@ package com.epita.guereza.application;
 import com.epita.domain.Crawler;
 import com.epita.domain.RawDocument;
 import com.epita.eventbus.client.EventBusClient;
+import com.epita.guereza.StringListWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-
 public class CrawlerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerApp.class);
+
     private final Crawler crawler;
     private final String subscribeUrl;
 
@@ -35,10 +35,9 @@ public class CrawlerApp extends App {
     private void storeUrls(final String[] urls) {
         if (urls != null) {
             LOGGER.info("Store {} urls", urls.length);
-            sendMessage("/store/crawler", Arrays.asList(urls));
+            sendMessage("/store/crawler", new StringListWrapper(urls));
         }
     }
-
 
     @Override
     public void run() {

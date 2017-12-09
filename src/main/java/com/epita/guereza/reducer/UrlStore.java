@@ -5,6 +5,7 @@ import com.epita.eventbus.EventMessage;
 import com.epita.eventbus.client.EventBusClient;
 import com.epita.eventsourcing.Event;
 import com.epita.eventsourcing.Reducer;
+import com.epita.guereza.StringListWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ public class UrlStore implements Reducer {
 
     public UrlStore(final EventBusClient eventBus) {
         this.eventBus = eventBus;
+
         final List<String> initialList = new ArrayList<>();
         initialList.add(STARTING_URL);
         store(initialList);
@@ -33,7 +35,7 @@ public class UrlStore implements Reducer {
     public void reduce(final Event<?> event) {
         switch (event.type) {
             case "ADD_URLS":
-                addUrls((Event<List<String>>) event);
+                addUrls((Event<StringListWrapper>) event);
                 break;
             case "CRAWLER_REQUEST_URL":
                 crawlerRequestUrl((Event<String>) event);
@@ -57,8 +59,8 @@ public class UrlStore implements Reducer {
         }
     }
 
-    private void addUrls(Event<List<String>> event) {
-        store(event.obj);
+    private void addUrls(Event<StringListWrapper> event) {
+        store(event.obj.list);
         LOGGER.info("added URLs to the repo");
     }
 

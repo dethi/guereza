@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class IndexerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexerApp.class);
+
     private final Indexer indexer;
     private final Crawler crawler;
     private final String subscribeUrl;
@@ -39,7 +40,6 @@ public class IndexerApp extends App {
         LOGGER.info("Request next URL");
         sendMessage("/request/indexer/url", subscribeUrl);
     }
-
 
     @Override
     public void run() {

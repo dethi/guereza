@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+
     protected final String uid;
     protected final EventBusClient eventBus;
 
@@ -33,7 +34,7 @@ public abstract class App {
      * @param channel The channel to send message
      * @param obj     The object to send
      */
-    public void sendMessage(final String channel, final Object obj) {
+    protected void sendMessage(final String channel, final Object obj) {
         try {
             final EventMessage em = new EventMessage(channel, obj);
             eventBus.publish(em);
