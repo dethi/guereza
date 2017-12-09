@@ -112,7 +112,6 @@ public class NettyEventBusClient implements EventBusClient {
     }
 
     private void trigger(final NettyEventBusClient.Message message) {
-        LOGGER.info("On '{}': receive: '{}'", message.getChannel(), message.getContent());
         subscriptionsMap.getOrDefault(message.getChannel(), new ArrayList<>())
                 .forEach(c -> c.getCallback().accept(message));
     }
