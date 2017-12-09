@@ -28,12 +28,12 @@ public class Main {
         final Function<Scope, CrawlerApp> newCrawlerApp = (s) -> new CrawlerApp(s.instanceOf(EventBusClient.class), s.instanceOf(Crawler.class));
         final Function<Scope, IndexerApp> newIndexerApp = (s) -> new IndexerApp(s.instanceOf(EventBusClient.class), s.instanceOf(Indexer.class),
                 s.instanceOf(Crawler.class));
-        final Function<Scope, Repo> newRepo = (s) -> new UrlStore(s.instanceOf(EventBusClient.class));
+        final Function<Scope, UrlStore> newUrlStore = (s) -> new UrlStore(s.instanceOf(EventBusClient.class));
 
         new Scope()
                 .register(new Singleton<>(Crawler.class, crawler))
                 .register(new Singleton<>(Indexer.class, indexer))
-                .register(new LazySingleton<>(Repo.class, newRepo))
+                .register(new LazySingleton<>(UrlStore.class, newUrlStore))
                 .register(new Prototype<>(EventBusClient.class, newEventBus))
                 .register(new Prototype<>(CrawlerApp.class, newCrawlerApp))
                 .register(new Prototype<>(IndexerApp.class, newIndexerApp))
