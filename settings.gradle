@@ -4,4 +4,3 @@ include 'domain', ':main'
 include 'winter', ':main'
 include 'eventbus', ':main'
 include 'eventsourcing', ':main'
-
