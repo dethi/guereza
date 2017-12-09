@@ -38,23 +38,23 @@ public abstract class App {
         try {
             final EventMessage em = new EventMessage(channel, obj);
             eventBus.publish(em);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             LOGGER.error("Impossible to send message: {}", e.getMessage());
         }
     }
 
-    protected void retryIn(final int seconds, Runnable consumer) {
+    protected void retryIn(final int seconds, final Runnable consumer) {
         LOGGER.info("Retry fetching url in {}seconds", seconds);
         final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(consumer, seconds, TimeUnit.SECONDS);
         executor.shutdownNow();
     }
 
-    protected Object mappingObject(EventBusClient.Message message) {
+    protected Object mappingObject(final EventBusClient.Message message) {
         try {
-            Class c = ClassLoader.getSystemClassLoader().loadClass(message.getMessageType());
+            final Class c = ClassLoader.getSystemClassLoader().loadClass(message.getMessageType());
             return new ObjectMapper().readValue(message.getContent(), c);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return null;
         }
     }

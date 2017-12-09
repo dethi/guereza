@@ -33,7 +33,7 @@ public class NettyServer {
             LOGGER.info("NettyServer: running on port {}", port);
 
             f.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             LOGGER.error("NettyServer: an error occurred while running: {}", e.getMessage());
         } finally {
             bossGroup.shutdownGracefully();

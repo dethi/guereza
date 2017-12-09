@@ -22,7 +22,7 @@ import static java.lang.System.exit;
 public class Main {
     private static final int NETTY_PORT = 8000;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         if (args.length != 2) {
             System.out.println("usage: ./bin [crawler | indexer | store | server] SERVER_HOST");
             exit(1);
@@ -54,7 +54,7 @@ public class Main {
                 .register(new Singleton<>(EventBusClient.class, new NettyEventBusClient(host, port)));
     }
 
-    private static void runCrawler(Scope scope) {
+    private static void runCrawler(final Scope scope) {
         final Function<Scope, App> newCrawlerApp = (s) -> new CrawlerApp(
                 s.instanceOf(EventBusClient.class), s.instanceOf(Crawler.class));
 
@@ -63,7 +63,7 @@ public class Main {
                 .block(Main::runApp);
     }
 
-    private static void runIndexer(Scope scope) {
+    private static void runIndexer(final Scope scope) {
         final Function<Scope, App> newIndexerApp = (s) -> new IndexerApp(
                 s.instanceOf(EventBusClient.class), s.instanceOf(Indexer.class), s.instanceOf(Crawler.class));
 
@@ -72,7 +72,7 @@ public class Main {
                 .block(Main::runApp);
     }
 
-    private static void runStore(Scope scope) {
+    private static void runStore(final Scope scope) {
         final Function<Scope, UrlStore> newUrlStore = (s) -> new UrlStore(s.instanceOf(EventBusClient.class));
         final Function<Scope, App> newEventStoreApp = (s) -> new EventStoreApp(
                 s.instanceOf(EventBusClient.class), s.instanceOf(EventStore.class));
@@ -89,8 +89,8 @@ public class Main {
                 .block(Main::runApp);
     }
 
-    private static void runApp(Scope scope) {
-        boolean ok = scope.instanceOf(EventBusClient.class).start();
+    private static void runApp(final Scope scope) {
+        final boolean ok = scope.instanceOf(EventBusClient.class).start();
         if (ok) {
             scope.instanceOf(App.class).run();
         }

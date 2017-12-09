@@ -46,8 +46,8 @@ public class UrlStore implements Reducer {
         }
     }
 
-    private void store(List<String> urls) {
-        for (String url : urls) {
+    private void store(final List<String> urls) {
+        for (final String url : urls) {
             if (url == null || url.isEmpty())
                 continue;
 
@@ -59,25 +59,25 @@ public class UrlStore implements Reducer {
         }
     }
 
-    private void addUrls(Event<StringListWrapper> event) {
+    private void addUrls(final Event<StringListWrapper> event) {
         store(event.obj.list);
         LOGGER.info("added URLs to the repo");
     }
 
-    private void crawlerRequestUrl(Event<String> event) {
+    private void crawlerRequestUrl(final Event<String> event) {
         try {
             LOGGER.info("Still {} urls to crawl", crawlerTodo.size());
             eventBus.publish(new EventMessage(event.obj, crawlerTodo.poll()));
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             LOGGER.error("cannot serialize: {}", e.getMessage());
         }
     }
 
-    private void indexerRequestUrl(Event<String> event) {
+    private void indexerRequestUrl(final Event<String> event) {
         try {
             LOGGER.info("Still {} urls to index", indexerTodo.size());
             eventBus.publish(new EventMessage(event.obj, indexerTodo.poll()));
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             LOGGER.error("cannot serialize: {}", e.getMessage());
         }
     }

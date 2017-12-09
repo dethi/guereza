@@ -33,14 +33,14 @@ public class AspectInvocationHandler<BEAN_TYPE> implements InvocationHandler {
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         if (beforeConsumers.containsKey(method)) {
-            for (BiConsumer<Scope, BEAN_TYPE> consumer : beforeConsumers.get(method)) {
+            for (final BiConsumer<Scope, BEAN_TYPE> consumer : beforeConsumers.get(method)) {
                 consumer.accept(scope, target);
             }
         }
 
-        Object res;
+        final Object res;
         if (aroundFunctions.containsKey(method)) {
-            AspectContext<BEAN_TYPE> context =
+            final AspectContext<BEAN_TYPE> context =
                     new AspectContext<>(target, method, args, aroundFunctions.get(method));
 
             res = context.invoke();
@@ -49,7 +49,7 @@ public class AspectInvocationHandler<BEAN_TYPE> implements InvocationHandler {
         }
 
         if (afterConsumers.containsKey(method)) {
-            for (BiConsumer<Scope, BEAN_TYPE> consumer : afterConsumers.get(method)) {
+            for (final BiConsumer<Scope, BEAN_TYPE> consumer : afterConsumers.get(method)) {
                 consumer.accept(scope, target);
             }
         }

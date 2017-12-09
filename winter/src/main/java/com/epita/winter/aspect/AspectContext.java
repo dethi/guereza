@@ -23,7 +23,7 @@ public class AspectContext<BEAN_TYPE> {
     }
 
     Object invoke() {
-        AspectContext<BEAN_TYPE> context =
+        final AspectContext<BEAN_TYPE> context =
                 new AspectContext<>(target, method, args, functions.subList(1, functions.size()));
 
         return functions.get(0).apply(context);

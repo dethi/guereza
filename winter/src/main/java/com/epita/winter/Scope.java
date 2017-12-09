@@ -28,7 +28,7 @@ public class Scope {
                                                final Class<?>... parameterTypes) {
         try {
             return klass.getMethod(name, parameterTypes);
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             throw new NoSuchElementException();
         }
     }
@@ -46,8 +46,8 @@ public class Scope {
             return parent.instanceOf(klass);
         }
 
-        Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);
-        BEAN_TYPE instance = provider.getInstance(klass, this);
+        final Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);
+        final BEAN_TYPE instance = provider.getInstance(klass, this);
         if (isBlock) {
             instances.put(instance, klass);
         }
@@ -67,16 +67,16 @@ public class Scope {
     @SuppressWarnings("unchecked")
     private <BEAN_TYPE> void release(final Class<? extends BEAN_TYPE> klass, final BEAN_TYPE target) {
         if (providers.containsKey(klass)) {
-            Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);
+            final Provider<BEAN_TYPE> provider = (Provider<BEAN_TYPE>) providers.get(klass);
             provider.callAfterDestroy(this, target);
         }
     }
 
-    public void block(Consumer<Scope> consumer) {
+    public void block(final Consumer<Scope> consumer) {
         isBlock = true;
         consumer.accept(this);
 
-        for (Map.Entry<Object, Class<?>> entry : instances.entrySet()) {
+        for (final Map.Entry<Object, Class<?>> entry : instances.entrySet()) {
             release(entry.getValue(), entry.getKey());
         }
         instances.clear();

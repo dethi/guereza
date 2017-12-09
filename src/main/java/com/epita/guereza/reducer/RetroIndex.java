@@ -22,7 +22,7 @@ public class RetroIndex implements Reducer {
         }
     }
 
-    private void addDocument(Event<Document> event) {
+    private void addDocument(final Event<Document> event) {
         index.docs.add(event.obj);
         LOGGER.info("added a document to the index");
     }

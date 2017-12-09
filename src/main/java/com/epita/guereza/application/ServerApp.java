@@ -6,7 +6,7 @@ public class ServerApp {
     private final NettyServer ns = new NettyServer();
     private final int port;
 
-    public ServerApp(int port) {
+    public ServerApp(final int port) {
         this.port = port;
     }
 

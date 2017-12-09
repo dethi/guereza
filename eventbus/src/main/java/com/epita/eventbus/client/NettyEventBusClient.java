@@ -44,7 +44,7 @@ public class NettyEventBusClient implements EventBusClient {
                     .handler(new NettyClientInitializer(this::trigger));
 
             nettyChannel = bootstrap.connect(host, port).sync().channel();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.error("Impossible to connect to {}:{}", host, port);
             return false;
         }
@@ -100,7 +100,7 @@ public class NettyEventBusClient implements EventBusClient {
             final String msg = new ObjectMapper().writeValueAsString(message);
             nettyChannel.writeAndFlush(msg + "\r\n");
             LOGGER.info("Sent message on '{}'", message.getChannel());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.error("Impossible to publish: {}", e.getMessage());
         }
     }

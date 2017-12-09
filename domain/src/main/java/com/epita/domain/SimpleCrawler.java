@@ -15,7 +15,7 @@ public class SimpleCrawler implements Crawler {
         try {
             LOGGER.info("crawling {}", url);
             return new RawDocument(Jsoup.connect(url).get());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error(e.getMessage());
             return null;
         }

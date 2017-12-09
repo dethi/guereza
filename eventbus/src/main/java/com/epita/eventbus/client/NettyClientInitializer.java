@@ -14,12 +14,12 @@ import java.util.function.Consumer;
 public class NettyClientInitializer extends ChannelInitializer<SocketChannel> {
     private final Consumer<EventMessage> consumer;
 
-    public NettyClientInitializer(Consumer<EventMessage> c) {
+    public NettyClientInitializer(final Consumer<EventMessage> c) {
         this.consumer = c;
     }
 
     @Override
-    public void initChannel(SocketChannel ch) {
+    public void initChannel(final SocketChannel ch) {
         final ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast(new DelimiterBasedFrameDecoder(1048576 * 2, Delimiters.lineDelimiter()));

@@ -27,12 +27,12 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     }
 
     public BEAN_TYPE getInstance(final Class<BEAN_TYPE> klass, final Scope scope) {
-        BEAN_TYPE target = createInstance(scope);
+        final BEAN_TYPE target = createInstance(scope);
         if (beforeConsumers.size() == 0 && afterConsumers.size() == 0) {
             return target;
         }
 
-        Object proxy = Proxy.newProxyInstance(
+        final Object proxy = Proxy.newProxyInstance(
                 klass.getClassLoader(), new Class<?>[]{klass}, getAspectInvocationHandler(scope, target));
         return klass.cast(proxy);
     }
@@ -71,7 +71,7 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     }
 
     public void callAfterDestroy(final Scope scope, final BEAN_TYPE target) {
-        for (BiConsumer<Scope, BEAN_TYPE> consumer : beforeDestroyConsumers) {
+        for (final BiConsumer<Scope, BEAN_TYPE> consumer : beforeDestroyConsumers) {
             consumer.accept(scope, target);
         }
     }
@@ -83,7 +83,7 @@ public abstract class AnyProvider<BEAN_TYPE> implements Provider<BEAN_TYPE> {
     }
 
     void callAfterCreate(final Scope scope, final BEAN_TYPE target) {
-        for (BiConsumer<Scope, BEAN_TYPE> consumer : afterCreateConsumers) {
+        for (final BiConsumer<Scope, BEAN_TYPE> consumer : afterCreateConsumers) {
             consumer.accept(scope, target);
         }
     }

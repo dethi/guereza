@@ -43,7 +43,7 @@ public class CrawlerApp extends App {
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
             if (msg != null) {
-                String url = (String) mappingObject(msg);
+                final String url = (String) mappingObject(msg);
                 if (url != null) {
                     LOGGER.info("Receive url: {}", url);
                     final String[] urls = crawlAndExtract(url);

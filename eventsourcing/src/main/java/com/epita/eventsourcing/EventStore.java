@@ -17,7 +17,7 @@ public class EventStore {
     }
 
     private void reduceAll(final Event<?> event) {
-        for (Reducer reducer : reducers) {
+        for (final Reducer reducer : reducers) {
             reducer.reduce(event);
         }
     }
