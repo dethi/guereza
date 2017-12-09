@@ -63,6 +63,7 @@ public class UrlStore implements Reducer {
 
     private void crawlerRequestUrl(Event<String> event) {
         try {
+            LOGGER.info("Still {} urls to crawl", crawlerTodo.size());
             eventBus.publish(new EventMessage(event.obj, crawlerTodo.poll()));
         } catch (JsonProcessingException e) {
             LOGGER.error("cannot serialize: {}", e.getMessage());
@@ -71,6 +72,7 @@ public class UrlStore implements Reducer {
 
     private void indexerRequestUrl(Event<String> event) {
         try {
+            LOGGER.info("Still {} urls to index", indexerTodo.size());
             eventBus.publish(new EventMessage(event.obj, indexerTodo.poll()));
         } catch (JsonProcessingException e) {
             LOGGER.error("cannot serialize: {}", e.getMessage());
