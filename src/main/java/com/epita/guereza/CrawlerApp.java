@@ -38,12 +38,16 @@ public class CrawlerApp extends App {
 
     @Override
     public void run() {
-        eventBus.subscribe(subscribeUrl, c -> {
-            System.out.println(c.getContent());
-            final String[] urls = crawlAndExtract(c.getContent());
-            storeUrls(urls);
+        eventBus.subscribe(subscribeUrl, msg -> {
+            if (msg != null) {
+                LOGGER.info("Receive url: {}", msg.getContent());
+                final String[] urls = crawlAndExtract(msg.getContent());
+                storeUrls(urls);
 
-            requestNextUrl();
+                requestNextUrl();
+            } else {
+                retryIn(30, this::requestNextUrl);
+            }
         });
 
         requestNextUrl();

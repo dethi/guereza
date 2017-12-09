@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public abstract class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -37,5 +40,12 @@ public abstract class App {
         } catch (JsonProcessingException e) {
             LOGGER.error("Impossible to send message: {}", e.getMessage());
         }
+    }
+
+    protected void retryIn(final int seconds, Runnable consumer) {
+        LOGGER.info("Retry fetching url in {}seconds", seconds);
+        final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.schedule(consumer, seconds, TimeUnit.SECONDS);
+        executor.shutdownNow();
     }
 }

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class IndexerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexerApp.class);
@@ -44,24 +45,17 @@ public class IndexerApp extends App {
         sendMessage("/request/indexer/url", subscribeUrl);
     }
 
-    private void retryIn(final int seconds) {
-        LOGGER.info("Retry fetching url in {}seconds", seconds);
-        final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.schedule(this::requestNextUrl, seconds, TimeUnit.SECONDS);
-        executor.shutdownNow();
-    }
 
     @Override
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
             if (msg != null) {
-                final String url = msg.getContent();
-                LOGGER.info("Receive url: {}", url);
-                indexAndPublish(url);
+                LOGGER.info("Receive url: {}", msg.getContent());
+                indexAndPublish(msg.getContent());
 
                 requestNextUrl();
             } else {
-                retryIn(30);
+                retryIn(30, this::requestNextUrl);
             }
         });
 
