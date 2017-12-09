@@ -1,4 +1,4 @@
-package com.epita.guereza.indexer;
+package com.epita.guereza.service.indexer;
 
 import java.util.Arrays;
 import java.util.HashSet;

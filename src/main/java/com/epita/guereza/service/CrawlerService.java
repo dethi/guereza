@@ -1,4 +1,4 @@
-package com.epita.guereza;
+package com.epita.guereza.service;
 
 import com.epita.domain.Crawler;
 import com.epita.domain.RawDocument;

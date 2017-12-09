@@ -1,11 +1,12 @@
 package com.epita.guereza;
 
-import com.epita.domain.Document;
-import com.epita.domain.Index;
-import com.epita.domain.Indexer;
-import com.epita.domain.RawDocument;
-import com.epita.eventbus.*;
-import com.epita.guereza.indexer.IndexerService;
+import com.epita.domain.*;
+import com.epita.eventbus.EventBusClient;
+import com.epita.eventbus.EventMessage;
+import com.epita.eventbus.NettyEventBusClient;
+import com.epita.eventbus.NettyServer;
+import com.epita.guereza.service.CrawlerService;
+import com.epita.guereza.service.indexer.IndexerService;
 import com.epita.winter.Scope;
 import com.epita.winter.provider.Prototype;
 import com.epita.winter.provider.Singleton;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.epita.winter.Scope.getMethod;
 
@@ -21,23 +23,48 @@ public class Main {
     private static final int NETTY_PORT = 8000;
 
     public static void main(String[] args) {
-        final Index index = new Index();
+//        final Index index = new Index();
+//        final Repo repo = new RepoStore();
+//
+//        //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
+//        //testWinter(repo);
+//
+//        boolean server = false;
+//        boolean client = true;
+//        if (server) {
+//            testEventBusClientSubscribe();
+//        } else {
+//            testServer();
+//        }
+//
+//        //testCrawl(repo);
+//        //testIndexing(repo, index);
+//        //testSearch(index, "onions courgettes pepper");
+
+        testApp();
+    }
+
+    private static void testApp() {
+        final Crawler crawler = new CrawlerService();
+        final Indexer indexer = new IndexerService();
         final Repo repo = new RepoStore();
 
-        //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
-        //testWinter(repo);
+        final Function<Scope, EventBusClient> newEventBus = (s) -> new NettyEventBusClient();
+        final Function<Scope, CrawlerApp> newCrawlerApp = (s) -> new CrawlerApp(s.instanceOf(Crawler.class),
+                s.instanceOf(Repo.class), s.instanceOf(EventBusClient.class));
+        final Function<Scope, IndexerApp> newIndexerApp = (s) -> new IndexerApp(s.instanceOf(Indexer.class),
+                s.instanceOf(Crawler.class), s.instanceOf(EventBusClient.class));
 
-        boolean server = false;
-        boolean client = true;
-        if (server) {
-            testEventBusClientSubscribe();
-        } else {
-            testServer();
-        }
-
-        //testCrawl(repo);
-        //testIndexing(repo, index);
-        //testSearch(index, "onions courgettes pepper");
+        new Scope()
+                .register(new Singleton<>(Crawler.class, crawler))
+                .register(new Singleton<>(Indexer.class, indexer))
+                .register(new Singleton<>(Repo.class, repo))
+                .register(new Prototype<>(EventBusClient.class, newEventBus))
+                .register(new Prototype<>(CrawlerApp.class, newCrawlerApp))
+                .register(new Prototype<>(IndexerApp.class, newIndexerApp))
+                .block((scope) -> {
+                    // MAIN CALL HERE
+                });
     }
 
     private static void testServer() {
