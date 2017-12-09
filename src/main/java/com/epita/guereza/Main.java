@@ -23,7 +23,7 @@ public class Main {
     private static final int NETTY_PORT = 8000;
 
     public static void main(String[] args) {
-        if (args.length < 1) {
+        if (args.length != 2) {
             System.out.println("usage: ./bin [crawler | indexer | store | server] server_url");
             exit(1);
         }
