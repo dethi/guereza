@@ -32,16 +32,4 @@ public class EventMessage implements EventBusClient.Message {
         return content;
     }
 
-    public void setChannel(EventBusClient.Channel channel) {
-        this.channel = channel;
-    }
-
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
 }

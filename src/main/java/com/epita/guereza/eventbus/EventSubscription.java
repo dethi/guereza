@@ -9,7 +9,7 @@ public class EventSubscription implements EventBusClient.Subscription {
     private final LocalDateTime subscriptionDateTime;
     private long messageReceivedCount;
 
-    public EventSubscription(EventBusClient.Channel channel, Consumer<EventBusClient.Message> callback) {
+    public EventSubscription(final EventBusClient.Channel channel, final Consumer<EventBusClient.Message> callback) {
         this.channel = channel;
         this.callback = callback;
         this.subscriptionDateTime = LocalDateTime.now();

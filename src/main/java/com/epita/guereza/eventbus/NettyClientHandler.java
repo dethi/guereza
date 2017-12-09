@@ -9,23 +9,23 @@ import java.util.function.Consumer;
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     private final Consumer<EventMessage> consumer;
 
-    public NettyClientHandler(Consumer<EventMessage> c) {
+    public NettyClientHandler(final Consumer<EventMessage> c) {
         this.consumer = c;
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, String msg) {
+    protected void channelRead0(final ChannelHandlerContext ctx, final String msg) {
         System.err.println(msg);
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        EventMessage res = new ObjectMapper().readValue(msg.toString(), EventMessage.class);
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        final EventMessage res = new ObjectMapper().readValue(msg.toString(), EventMessage.class);
         consumer.accept(res);
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         cause.printStackTrace();
         ctx.close();
     }
