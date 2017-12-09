@@ -20,17 +20,16 @@ import java.util.function.Function;
 import static java.lang.System.exit;
 
 public class Main {
-    private static final String NETTY_HOST = "localhost";
     private static final int NETTY_PORT = 8000;
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("usage: ./bin [ crawler | indexer | store | server");
+        if (args.length < 1) {
+            System.out.println("usage: ./bin [crawler | indexer | store | server] server_url");
             exit(1);
         }
 
         final String module = args[0];
-        final Scope scope = createScope();
+        final Scope scope = createScope(args[1], NETTY_PORT);
 
         switch (module) {
             case "crawler":
@@ -48,11 +47,11 @@ public class Main {
         }
     }
 
-    private static Scope createScope() {
+    private static Scope createScope(final String host, final int port) {
         return new Scope()
                 .register(new Singleton<>(Crawler.class, new CrawlerService()))
                 .register(new Singleton<>(Indexer.class, new IndexerService()))
-                .register(new Singleton<>(EventBusClient.class, new NettyEventBusClient()));
+                .register(new Singleton<>(EventBusClient.class, new NettyEventBusClient(host, port)));
     }
 
     private static void runCrawler(Scope scope) {
@@ -96,7 +95,7 @@ public class Main {
     }
 
     private static void runApp(Scope scope) {
-        boolean ok = scope.instanceOf(EventBusClient.class).start(NETTY_HOST, NETTY_PORT);
+        boolean ok = scope.instanceOf(EventBusClient.class).start();
         if (ok) {
             scope.instanceOf(App.class).run();
         }

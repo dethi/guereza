@@ -19,15 +19,19 @@ public class NettyEventBusClient implements EventBusClient {
     private final Map<String, List<Subscription>> subscriptionsMap;
     private io.netty.channel.Channel nettyChannel;
     private EventLoopGroup group;
+    private final String host;
+    private final int port;
 
-    public NettyEventBusClient() {
+    public NettyEventBusClient(final String host, final int port) {
         subscriptionsMap = new HashMap<>();
         group = new NioEventLoopGroup();
         nettyChannel = null;
+        this.host = host;
+        this.port = port;
     }
 
     @Override
-    public boolean start(final String host, final int port) {
+    public boolean start() {
         if (nettyChannel != null)
             return false;
 
