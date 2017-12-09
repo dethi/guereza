@@ -27,7 +27,7 @@ public abstract class App {
      * Send an object through the eventBus
      *
      * @param channel The channel to send message
-     * @param obj The object to send
+     * @param obj     The object to send
      */
     public void sendMessage(final String channel, final Object obj) {
         try {

@@ -1,7 +1,5 @@
 package com.epita.eventbus;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 

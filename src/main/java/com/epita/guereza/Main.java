@@ -13,7 +13,6 @@ import com.epita.winter.Scope;
 import com.epita.winter.provider.LazySingleton;
 import com.epita.winter.provider.Prototype;
 import com.epita.winter.provider.Singleton;
-import com.sun.security.ntlm.Server;
 
 import java.util.Map;
 import java.util.function.Function;

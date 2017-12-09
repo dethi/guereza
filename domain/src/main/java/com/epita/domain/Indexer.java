@@ -11,7 +11,7 @@ public interface Indexer {
      * @param url The url to index
      * @return The result document
      */
-     Document index(final String text, final String url);
+    Document index(final String text, final String url);
 
     /**
      * Search a query in a list of document

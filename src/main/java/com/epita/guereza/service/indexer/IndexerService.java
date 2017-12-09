@@ -1,6 +1,8 @@
 package com.epita.guereza.service.indexer;
 
-import com.epita.domain.*;
+import com.epita.domain.Document;
+import com.epita.domain.Indexer;
+import com.epita.domain.Term;
 import com.epita.guereza.service.CrawlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
