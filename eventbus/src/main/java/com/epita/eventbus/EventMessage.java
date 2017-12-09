@@ -5,21 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EventMessage implements EventBusClient.Message {
 
-    private EventBusClient.Channel channel;
+    private String channel;
     private String messageType;
     private String content;
 
     public EventMessage() {
     }
 
-    public EventMessage(final EventBusClient.Channel channel, final Object content) throws JsonProcessingException {
+    public EventMessage(final String channel, final Object content) throws JsonProcessingException {
         this.channel = channel;
         this.messageType = content.getClass().getName();
         this.content = new ObjectMapper().writeValueAsString(content);
     }
 
     @Override
-    public EventBusClient.Channel getChannel() {
+    public String getChannel() {
         return channel;
     }
 

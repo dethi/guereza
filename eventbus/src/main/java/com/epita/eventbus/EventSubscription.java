@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 public class EventSubscription implements EventBusClient.Subscription {
-    private final EventBusClient.Channel channel;
+    private final String channel;
     private final Consumer<EventBusClient.Message> callback;
     private final LocalDateTime subscriptionDateTime;
     private long messageReceivedCount;
 
-    public EventSubscription(final EventBusClient.Channel channel, final Consumer<EventBusClient.Message> callback) {
+    public EventSubscription(final String channel, final Consumer<EventBusClient.Message> callback) {
         this.channel = channel;
         this.callback = callback;
         this.subscriptionDateTime = LocalDateTime.now();
@@ -17,7 +17,7 @@ public class EventSubscription implements EventBusClient.Subscription {
     }
 
     @Override
-    public EventBusClient.Channel getChannel() {
+    public String getChannel() {
         return channel;
     }
 

@@ -18,7 +18,7 @@ public interface EventBusClient {
      * @param callback The callback to register and have called on message reception.
      * @return A subscription object to keep track of subscription and statistics.
      */
-    Subscription subscribe(final Channel channel, final Consumer<Message> callback);
+    Subscription subscribe(final String channel, final Consumer<Message> callback);
 
     /**
      * Revoke the given subscription.
@@ -33,21 +33,8 @@ public interface EventBusClient {
      * @param channel The channel to publish to.
      * @param message The message to publish.
      */
-    void publish(final Channel channel, final Message message);
+    void publish(final String channel, final Message message);
 
-
-    /**
-     * Interface for channels.
-     */
-    @JsonDeserialize(as = EventChannel.class)
-    interface Channel {
-        /**
-         * Get the address of the given channel.
-         *
-         * @return the address of the given channel.
-         */
-        String getAddress();
-    }
 
     /**
      * Interface for messages.
@@ -58,7 +45,7 @@ public interface EventBusClient {
          *
          * @return the origin channel.
          */
-        Channel getChannel();
+        String getChannel();
 
         /**
          * Get the (java) type of the message content.
@@ -86,7 +73,7 @@ public interface EventBusClient {
          *
          * @return get the subscription channel.
          */
-        Channel getChannel();
+        String getChannel();
 
         /**
          * Get the callback to call for incoming messages.

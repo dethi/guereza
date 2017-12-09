@@ -25,15 +25,15 @@ public class Main {
         final Repo repo = new RepoStore();
 
         //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
-        testWinter(repo);
-//
-//        boolean server = false;
-//        boolean client = true;
-//        if (client) {
-//            testEventBusClientSubscribe();
-//        } else {
-//            testServer();
-//        }
+        //testWinter(repo);
+
+        boolean server = false;
+        boolean client = true;
+        if (client) {
+            testEventBusClientSubscribe();
+        } else {
+            testServer();
+        }
 
         //testCrawl(repo);
         //testIndexing(repo, index);
@@ -51,13 +51,12 @@ public class Main {
         final boolean succeed = nebc.run(NETTY_HOST, NETTY_PORT);
 
         if (succeed) {
-            final EventChannel channel = new EventChannel("room");
-            final EventBusClient.Subscription s = nebc.subscribe(new EventChannel("room"), message -> {
+            final EventBusClient.Subscription s = nebc.subscribe("room", message -> {
                 System.out.println("sub: " + message.getContent());
             });
             try {
-                nebc.publish(channel, new EventMessage(channel, "Hi!"));
-                nebc.publish(channel, new EventMessage(new EventChannel("game"), "Salut mec"));
+                nebc.publish("room", new EventMessage("room", "Hi!"));
+                nebc.publish("game", new EventMessage("game", "Salut mec"));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }

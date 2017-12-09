@@ -68,13 +68,13 @@ public class NettyEventBusClient implements EventBusClient {
      * @return The subscription object created
      */
     @Override
-    public Subscription subscribe(final NettyEventBusClient.Channel channel, final Consumer<Message> callback) {
-        LOGGER.info("EventBusClient: subscribe to '{}'", channel.getAddress());
+    public Subscription subscribe(final String channel, final Consumer<Message> callback) {
+        LOGGER.info("EventBusClient: subscribe to '{}'", channel);
         final EventSubscription s = new EventSubscription(channel, callback);
 
-        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(channel.getAddress(), new ArrayList<>());
+        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(channel, new ArrayList<>());
         subscriptions.add(s);
-        subscriptionsMap.put(channel.getAddress(), subscriptions);
+        subscriptionsMap.put(channel, subscriptions);
 
         return s;
     }
@@ -86,11 +86,11 @@ public class NettyEventBusClient implements EventBusClient {
      */
     @Override
     public void revoke(final NettyEventBusClient.Subscription subscription) {
-        LOGGER.info("EventBusClient: unsubscribe from '{}'", subscription.getChannel().getAddress());
-        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(subscription.getChannel().getAddress(), new ArrayList<>());
-        final Channel channel = subscription.getChannel();
+        LOGGER.info("EventBusClient: unsubscribe from '{}'", subscription.getChannel());
+        final List<Subscription> subscriptions = subscriptionsMap.getOrDefault(subscription.getChannel(), new ArrayList<>());
+        final String channel = subscription.getChannel();
         subscriptions.remove(subscription);
-        subscriptionsMap.put(channel.getAddress(), subscriptions);
+        subscriptionsMap.put(channel, subscriptions);
     }
 
     /**
@@ -100,22 +100,22 @@ public class NettyEventBusClient implements EventBusClient {
      * @param message The message to publish.
      */
     @Override
-    public void publish(final Channel channel, final NettyEventBusClient.Message message) {
+    public void publish(final String channel, final NettyEventBusClient.Message message) {
         if (nettyChannel == null)
             return;
 
         try {
             final String msg = new ObjectMapper().writeValueAsString(message);
             nettyChannel.writeAndFlush(msg + "\r\n");
-            LOGGER.info("EventBusClient: sent message on '{}'", message.getChannel().getAddress());
+            LOGGER.info("EventBusClient: sent message on '{}'", message.getChannel());
         } catch (Exception $e) {
             LOGGER.error("EventBusClient: Impossible to publish");
         }
     }
 
     private void trigger(final NettyEventBusClient.Message message) {
-        LOGGER.info("EventBusClient: on '{}': receive: '{}'", message.getChannel().getAddress(), message.getContent());
-        subscriptionsMap.getOrDefault(message.getChannel().getAddress(), new ArrayList<>())
+        LOGGER.info("EventBusClient: on '{}': receive: '{}'", message.getChannel(), message.getContent());
+        subscriptionsMap.getOrDefault(message.getChannel(), new ArrayList<>())
                 .forEach(c -> c.getCallback().accept(message));
     }
 
