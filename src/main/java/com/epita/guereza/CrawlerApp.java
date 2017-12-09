@@ -10,7 +10,7 @@ public class CrawlerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(CrawlerApp.class);
     private final Crawler crawler;
 
-    public CrawlerApp(final Crawler crawler, final EventBusClient eventBus) {
+    public CrawlerApp(final EventBusClient eventBus, final Crawler crawler) {
         super(eventBus);
         this.crawler = crawler;
     }

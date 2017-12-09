@@ -47,10 +47,9 @@ public class Main {
         final Repo repo = new RepoStore();
 
         final Function<Scope, EventBusClient> newEventBus = (s) -> new NettyEventBusClient();
-        final Function<Scope, CrawlerApp> newCrawlerApp = (s) -> new CrawlerApp(s.instanceOf(Crawler.class),
-                s.instanceOf(EventBusClient.class));
-        final Function<Scope, IndexerApp> newIndexerApp = (s) -> new IndexerApp(s.instanceOf(Indexer.class),
-                s.instanceOf(Crawler.class), s.instanceOf(EventBusClient.class));
+        final Function<Scope, CrawlerApp> newCrawlerApp = (s) -> new CrawlerApp(s.instanceOf(EventBusClient.class), s.instanceOf(Crawler.class));
+        final Function<Scope, IndexerApp> newIndexerApp = (s) -> new IndexerApp(s.instanceOf(EventBusClient.class), s.instanceOf(Indexer.class),
+                s.instanceOf(Crawler.class));
 
         new Scope()
                 .register(new Singleton<>(Crawler.class, crawler))

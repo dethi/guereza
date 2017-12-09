@@ -14,7 +14,7 @@ public class IndexerApp extends App {
     private final Indexer indexer;
     private final Crawler crawler;
 
-    public IndexerApp(final Indexer indexer, final Crawler crawler, final EventBusClient eventBus) {
+    public IndexerApp(final EventBusClient eventBus, final Indexer indexer, final Crawler crawler) {
         super(eventBus);
 
         this.indexer = indexer;
