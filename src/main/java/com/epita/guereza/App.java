@@ -37,7 +37,6 @@ public abstract class App {
         try {
             final EventMessage em = new EventMessage(channel, obj);
             eventBus.publish(em);
-            LOGGER.info("Requesting next url");
         } catch (JsonProcessingException e) {
             LOGGER.error("Impossible to send message: {}", e.getMessage());
         }
