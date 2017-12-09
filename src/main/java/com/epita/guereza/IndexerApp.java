@@ -8,6 +8,9 @@ import com.epita.eventbus.EventBusClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.util.concurrent.*;
+
 public class IndexerApp extends App {
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexerApp.class);
     private final Indexer indexer;
@@ -40,14 +43,25 @@ public class IndexerApp extends App {
         sendMessage("/request/indexer/url", subscribeUrl);
     }
 
+    private void retryIn(final int seconds) {
+        LOGGER.info("Retry fetching url in {}seconds", seconds);
+        final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.schedule(this::requestNextUrl, seconds, TimeUnit.SECONDS);
+        executor.shutdownNow();
+    }
+
     @Override
     public void run() {
         eventBus.subscribe(subscribeUrl, msg -> {
-            final String url = msg.getContent();
-            LOGGER.info("Receive url: {}", url);
-            indexAndPublish(url);
+            if (msg != null) {
+                final String url = msg.getContent();
+                LOGGER.info("Receive url: {}", url);
+                indexAndPublish(url);
 
-            requestNextUrl();
+                requestNextUrl();
+            } else {
+                retryIn(30);
+            }
         });
 
         requestNextUrl();
