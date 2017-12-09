@@ -18,15 +18,24 @@ public abstract class App {
         this.eventBus = eventBus;
     }
 
+    /**
+     * The main stuff
+     */
     public abstract void run();
 
+    /**
+     * Send an object through the eventBus
+     *
+     * @param channel The channel to send message
+     * @param obj The object to send
+     */
     public void sendMessage(final String channel, final Object obj) {
         try {
             final EventMessage em = new EventMessage(channel, obj);
             eventBus.publish(em);
             LOGGER.info("Requesting next url");
         } catch (JsonProcessingException e) {
-            LOGGER.error("Cannot serialize message: {}", e.getMessage());
+            LOGGER.error("Impossible to send message: {}", e.getMessage());
         }
     }
 }
