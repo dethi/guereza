@@ -1,7 +1,7 @@
 package com.epita.guereza;
 
-import com.epita.guereza.domain.Crawler;
-import com.epita.guereza.domain.RawDocument;
+import com.epita.domain.Crawler;
+import com.epita.domain.RawDocument;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;

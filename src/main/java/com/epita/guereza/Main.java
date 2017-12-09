@@ -1,20 +1,20 @@
 package com.epita.guereza;
 
-import com.epita.guereza.domain.Document;
-import com.epita.guereza.domain.Index;
-import com.epita.guereza.domain.Indexer;
-import com.epita.guereza.domain.RawDocument;
-import com.epita.guereza.eventbus.*;
+import com.epita.domain.Document;
+import com.epita.domain.Index;
+import com.epita.domain.Indexer;
+import com.epita.domain.RawDocument;
+import com.epita.eventbus.*;
 import com.epita.guereza.indexer.IndexerService;
-import com.epita.guereza.winter.Scope;
-import com.epita.guereza.winter.provider.Prototype;
-import com.epita.guereza.winter.provider.Singleton;
+import com.epita.winter.Scope;
+import com.epita.winter.provider.Prototype;
+import com.epita.winter.provider.Singleton;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static com.epita.guereza.winter.Scope.getMethod;
+import static com.epita.winter.Scope.getMethod;
 
 public class Main {
     private static final String NETTY_HOST = "localhost";
@@ -25,15 +25,15 @@ public class Main {
         final Repo repo = new RepoStore();
 
         //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
-        //testWinter(repo);
-
-        boolean server = false;
-        boolean client = true;
-        if (client) {
-            testEventBusClientSubscribe();
-        } else {
-            testServer();
-        }
+        testWinter(repo);
+//
+//        boolean server = false;
+//        boolean client = true;
+//        if (client) {
+//            testEventBusClientSubscribe();
+//        } else {
+//            testServer();
+//        }
 
         //testCrawl(repo);
         //testIndexing(repo, index);
