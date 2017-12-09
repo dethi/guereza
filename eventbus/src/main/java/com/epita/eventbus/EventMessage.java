@@ -9,6 +9,7 @@ public class EventMessage implements EventBusClient.Message {
     private String messageType;
     private String content;
 
+    @SuppressWarnings("unused")
     public EventMessage() {
     }
 
