@@ -27,7 +27,6 @@ public class Main {
 //        final Repo repo = new RepoStore();
 //
 //        //repo.store(new String[]{"https://www.bbc.co.uk/food/recipes/saladenicoise_6572"});
-//        //testWinter(repo);
 //
 //        boolean server = false;
 //        boolean client = true;
@@ -90,38 +89,6 @@ public class Main {
             }
         }
     }
-
-    private static void testWinter(final Repo repo) {
-        Method method = getMethod(Repo.class, "nextUrl");
-        new Scope()
-                .register(
-                        new Singleton<>(Repo.class, repo)
-                                .before(method, (s, obj) -> System.out.println("before::"))
-                                .after(method, (s, obj) -> System.out.println("after::"))
-                                .around(method, (ctx) -> {
-                                    System.out.println("beforeAround::");
-                                    Object obj = ctx.call();
-                                    System.out.println("afterAround::");
-                                    return obj;
-                                })
-                                .beforeDestroy((s, obj) -> System.out.println("destroy::")))
-                .register(
-                        new Prototype<>(Indexer.class, (s) -> new IndexerService())
-                                .afterCreate((s, obj) -> System.out.println("beforeCreate::"))
-                                .beforeDestroy((s, obj) -> System.out.println("destroy::"))
-                )
-                .block((s) -> {
-                    Repo r = s.instanceOf(Repo.class);
-                    System.out.println(r.nextUrl());
-                    s.instanceOf(Indexer.class);
-
-                    s.scope().register(new Singleton<>(Repo.class, new RepoStore())).block((s2) -> {
-                        Repo r2 = s2.instanceOf(Repo.class);
-                        System.out.println(r2.nextUrl());
-                    });
-                });
-    }
-
 
     private static void testSearch(final Index index, final String query) {
         IndexerService indexer = new IndexerService();
