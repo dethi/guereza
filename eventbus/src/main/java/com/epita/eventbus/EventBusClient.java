@@ -10,6 +10,15 @@ import java.util.function.Consumer;
 public interface EventBusClient {
 
     /**
+     * Start the client
+     *
+     * @param host The host of the server
+     * @param port The port of the server
+     * @return Whether or not the run succeed
+     */
+    boolean start(final String host, final int port);
+
+    /**
      * Subscribe to the given channel.
      *
      * @param channel  The channel to subscribe to.

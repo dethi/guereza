@@ -26,12 +26,8 @@ public class NettyEventBusClient implements EventBusClient {
         nettyChannel = null;
     }
 
-    /**
-     * Start the EvenBusClient
-     *
-     * @return Whether or not the run succeed
-     */
-    public boolean run(final String host, final int port) {
+    @Override
+    public boolean start(final String host, final int port) {
         if (nettyChannel != null)
             return false;
 
